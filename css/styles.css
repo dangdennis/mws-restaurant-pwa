@@ -141,6 +141,12 @@ nav h1 a {
     min-height: 50px;
     width: 100%;
 }
+.filter-options .inner {
+    margin: 0 auto;
+    max-width: 1300px;
+    padding-left: 20px;
+    width: 1080px;
+}
 .filter-options h2 {
     color: white;
     font-size: 1rem;
@@ -167,7 +173,8 @@ nav h1 a {
     flex-wrap: wrap;
     justify-content: center;
     list-style: outside none none;
-    margin: 0;
+    margin: 0 auto;
+    max-width: 1300px;
     padding: 30px 15px 60px;
     text-align: center;
 }
@@ -177,7 +184,7 @@ nav h1 a {
     font-family: Arial, sans-serif;
     margin: 15px;
     min-height: 380px;
-    padding: 0 30px 25px;
+    padding: 0 10px 25px;
     text-align: left;
     width: 270px;
 }
@@ -288,17 +295,19 @@ nav h1 a {
     padding-bottom: 1pt;
 }
 #reviews-list {
-    margin: 0;
     padding: 0;
+    margin: 0;
+    margin-bottom: 50px;
 }
 #reviews-list li {
     background-color: #fff;
     border: 2px solid #f3f3f3;
+    border-top-left-radius: 35px;
     display: block;
     list-style-type: none;
-    margin: 0 0 30px;
+    margin: 15px auto;
     overflow: hidden;
-    padding: 0 20px 20px;
+    padding: 20px;
     position: relative;
     width: 85%;
 }
@@ -309,8 +318,26 @@ nav h1 a {
     color: #666;
 }
 
+@media screen and (min-width: 768px) {
+    .inside #restaurant-container {
+        width: 45%;
+    }
+
+    .inside #reviews-container {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        width: 45%;
+    }
+
+    .inside #footer {
+        width: 45.5%;
+    }
+}
+
 /* Media queries for medium size device + below */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 767px) {
     /* ========== Map ========== */
     .inside #map-container {
         display: block;
@@ -331,10 +358,28 @@ nav h1 a {
 
     /* ========== Restaurant related ==========  */
     .inside #restaurant-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         margin-left: auto;
         margin-right: auto;
         margin-top: 20px;
         padding: 0;
+        width: 90%;
+    }
+
+    .inside #restaurant-container .details {
+        align-self: flex-start;
+        margin: 0 auto;
+        width: 90%;
+    }
+
+    .inside #reviews-container {
+        padding: 20px;
+        width: 90%;
+    }
+
+    .inside #footer {
         width: 100%;
     }
 }
