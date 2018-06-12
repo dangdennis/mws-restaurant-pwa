@@ -94,3 +94,9 @@ self.__precacheManifest = [
 ].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
+
+// const matchCb = ({url, event}) => {
+//   return (url.pathname.indexOf('restaurant.html'));
+// };
+// const matchCb = new RegExp('rest')
+// workbox.routing.registerRoute(matchCb, workbox.strategies.staleWhileRevalidate());
