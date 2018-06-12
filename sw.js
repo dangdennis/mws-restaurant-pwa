@@ -95,6 +95,5 @@ self.__precacheManifest = [
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-const matchCb = new RegExp("/restaurant.index?*/");
-
+const matchCb = new RegExp("restaurant.html?(.*)");
 workbox.routing.registerRoute(matchCb, workbox.strategies.staleWhileRevalidate());
