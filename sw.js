@@ -95,8 +95,45 @@ self.__precacheManifest = [
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
+self.addEventListener("fetch", event => {
+    let cacheRequest = event.request;
+    let cacheUrlObj = new URL(event.request.url);
+    if (event.request.url.indexOf("restaurant.html") > -1) {
+        const cacheURL = "restaurant.html";
+        cacheRequest = new Request(cacheURL);
+    }
+
+    handleNonAJAXEvent(event, cacheRequest);
+});
+
+const handleNonAJAXEvent = (event, cacheRequest) => {
+    // Check if the HTML request has previously been cached. If so, return the
+    // response from the cache. If not, fetch the request, cache it, and then return
+    // it.
+    event.respondWith(
+        caches.match(cacheRequest).then(response => {
+            return (
+                response ||
+                fetch(event.request)
+                    .then(fetchResponse => {
+                        return caches.open(cacheID).then(cache => {
+                            return fetchResponse;
+                        });
+                    })
+                    .catch(error => {
+                        return new Response("Application is not connected to the internet", {
+                            status: 404,
+                            statusText: "Application is not connected to the internet",
+                        });
+                    })
+            );
+        }),
+    );
+};
+/*
 // const matchCb = ({url, event}) => {
 //   return (url.pathname.indexOf('restaurant.html'));
 // };
 // const matchCb = new RegExp('rest')
 // workbox.routing.registerRoute(matchCb, workbox.strategies.staleWhileRevalidate());
+*/
