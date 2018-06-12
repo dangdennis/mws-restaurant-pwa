@@ -88,12 +88,15 @@ self.__precacheManifest = [
         revision: "a5f69c9eff97d444606202a7447ca5ce",
     },
     {
-        url: "restaurant.html",
+        url: new RegExp("restaurant.html*"),
         revision: "0a7df9fce9fca0d7769f515e34ba1cfd",
     },
 ].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-const matchCb = new RegExp("/restaurant.html?(.*)");
-workbox.routing.registerRoute(matchCb, workbox.strategies.staleWhileRevalidate());
+// const matchCb = ({url, event}) => {
+//   return (url.pathname.indexOf('restaurant.html'));
+// };
+// const matchCb = new RegExp('rest')
+// workbox.routing.registerRoute(matchCb, workbox.strategies.staleWhileRevalidate());
