@@ -59,11 +59,6 @@ self.addEventListener("fetch", function(event) {
             return;
         }
 
-        if (requestUrl.pathname.startsWith("/img")) {
-            event.respondWith(caches.match(servePhoto(event.request)));
-            return;
-        }
-
         event.respondWith(
             caches.match(event.request).then(function(response) {
                 return response || fetch(event.request);
