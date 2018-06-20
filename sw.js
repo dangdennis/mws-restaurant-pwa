@@ -44,9 +44,13 @@ self.addEventListener("fetch", function(event) {
             return;
         }
 
-        // photos (non-static)
         if (requestUrl.pathname.startsWith("restaurant.html")) {
             event.respondWith(caches.match("restaurant.html"));
+            return;
+        }
+
+        if (requestUrl.pathname.startsWith("/img")) {
+            event.respondWith(caches.match(servePhoto(event.request)));
             return;
         }
     }
@@ -57,3 +61,18 @@ self.addEventListener("fetch", function(event) {
         }),
     );
 });
+
+function servePhoto(request) {
+    const storageUrl = request.url.replace(/-\d+px\.jpg$/, "");
+
+    return caches.open(CONTENT_IMG_CACHE).then(cache =>
+        cache.match(storageUrl).then(function(response) {
+            if (response) return response;
+
+            return fetch(request).then(function(networkResponse) {
+                cache.put(storageUrl, networkResponse.clone());
+                return networkResponse;
+            });
+        }),
+    );
+}
