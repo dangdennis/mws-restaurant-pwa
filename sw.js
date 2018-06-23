@@ -58,6 +58,18 @@ self.addEventListener("fetch", function(event) {
             event.respondWith(caches.match("restaurant.html"));
             return;
         }
+
+        event.respondWith(async function() {
+            // Try to get the response from a cache.
+            const cache = await caches.open(STATIC_CACHE_NAME);
+            const cachedResponse = await cache.match(event.request);
+        
+            if (cachedResponse) {
+              // If we found a match in the cache, return it, but also
+              // update the entry in the cache in the background.
+              event.waitUntil(cache.add(event.request));
+              return cachedResponse;
+            }
     }
 });
 
