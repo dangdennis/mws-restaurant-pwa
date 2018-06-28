@@ -21,11 +21,11 @@
 
   <main id="maincontent">
     <section id="map-container">
-      <div id="map"></div>
+      <div id="map" aria-label="Map of Restaurants"></div>
     </section>
     <section>
       <div class="filter-options">
-        <div class="inner">
+        <div class="inner" aria-label="Filter Restaurants">
           <h2>Filter Results</h2>
           <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
             <option value="all">All Neighborhoods</option>
@@ -35,7 +35,7 @@
           </select>
         </div>
       </div>
-      <ul id="restaurants-list"></ul>
+      <ul id="restaurants-list" aria-label="List of Restaurants"></ul>
     </section>
   </main>
 
@@ -51,7 +51,7 @@
   <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC66UwvJgp0NdsT0SJ_wSSGAdgk7Q3p-Cc&libraries=places&callback=initMap"></script>
-  <script>
+  <!-- <script>
     // Check that service workers are registered
     if ('serviceWorker' in navigator) {
       // Use the window load event to keep the page load performant
@@ -59,7 +59,7 @@
         navigator.serviceWorker.register('/sw.js');
       });
     }
-  </script>
+  </script> -->
 
 </body>
 

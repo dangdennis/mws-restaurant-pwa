@@ -123,6 +123,7 @@ createReviewHTML = review => {
     const header = document.createElement('div');
     header.classList.add('header');
     const li = document.createElement('li');
+    li.setAttribute('aria-label', 'Review');
 
     const name = document.createElement('p');
     name.innerHTML = review.name;
