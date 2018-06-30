@@ -95,8 +95,7 @@ self.__precacheManifest = [
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerRoute(new RegExp('restaurant.html'), (res: { url, event, params }) => {
+workbox.routing.registerRoute(new RegExp('restaurant.html'), res => {
     // Response will be “A guide on Workbox”
-    console.log({res})
-    console.log(url, event, params);
+    console.log({ res });
 });
