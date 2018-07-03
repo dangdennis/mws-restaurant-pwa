@@ -9,6 +9,7 @@ var cacheFiles = [
     '/js/dbhelper.js',
     '/js/restaurant_info.js',
     '/css/styles.css',
+    '/data/restaurants.json',
     '/img/1.jpg',
     '/img/2.jpg',
     '/img/3.jpg',
@@ -35,13 +36,13 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', event => {
     console.log('Service worker activating');
-    console.log({ event: event.request });
+    console.log(event.request);
     event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', event => {
     console.log('Service worker fetching');
-    console.log({ event: event.request });
+    console.log(event.request);
     event.respondWith(
         caches
             .open(cacheName)
