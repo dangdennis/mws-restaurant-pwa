@@ -36,13 +36,13 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', event => {
     console.log('Service worker activating');
-    console.log(event.request);
+    // console.log(event.request);
     event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', event => {
     console.log('Service worker fetching');
-    console.log(event.request);
+    // console.log(event.request);
     event.respondWith(
         caches
             .open(cacheName)
