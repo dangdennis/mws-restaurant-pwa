@@ -1,4 +1,4 @@
-importScripts('/cache-polyfill.js');
+// importScripts('/cache-polyfill.js');
 
 // Default files to always cache
 var cacheFiles = [
