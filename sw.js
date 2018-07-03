@@ -52,19 +52,19 @@ self.addEventListener("activate", function(e) {
 self.addEventListener("fetch", function(e) {
     console.log("[ServiceWorker] Fetch", e.request.url);
 
-    var requestUrl = new URL(e.request.url);
+    // var requestUrl = new URL(e.request.url);
 
-    if (requestUrl.origin === location.origin) {
-        if (requestUrl.pathname === "/") {
-            e.respondWith(caches.match("/"));
-            return;
-        }
+    // if (requestUrl.origin === location.origin) {
+    //     if (requestUrl.pathname === "/") {
+    //         e.respondWith(caches.match("/"));
+    //         return;
+    //     }
 
-        if (requestUrl.pathname === "/restaurant.html") {
-            e.respondWith(caches.match("/restaurant.html"));
-            return;
-        }
-    }
+    //     if (requestUrl.pathname === "/restaurant.html") {
+    //         e.respondWith(caches.match("/restaurant.html"));
+    //         return;
+    //     }
+    // }
 
     // e.respondWidth Responds to the fetch event
     e.respondWith(
