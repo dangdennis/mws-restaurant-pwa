@@ -25,15 +25,14 @@ class DBHelper {
             // Get restaurants from indexedDB if it exists
             if (IDB.isIndexedDBSupported) {
                 await IDB.createObjectStore();
-                restaurants = await IDB.get('restaurants');
+                restaurants = await IDB.get('restaurants').then(res => res);
             }
 
             // Fetch restaurants if still undefined after Idb attempt
-            // if (!restaurants) {
-            //     console.log('we have to fetch restaurants from a server');
-            //     restaurants = await fetch(DBHelper.DATABASE_URL).then(res => res.json());
-            //     IDB.set('restaurants', restaurants);
-            // }
+            if (!restaurants) {
+                restaurants = await fetch(DBHelper.DATABASE_URL).then(res => res.json());
+                IDB.set('restaurants', restaurants);
+            }
 
             callback(null, restaurants);
         } catch (error) {
@@ -225,10 +224,11 @@ class IDB {
     static get(key) {
         const dbPromise = idb.open(IDB.DATABASE_NAME, 1);
         return dbPromise.then(db => {
-            return db
+            const retrieved = db
                 .transaction(IDB.STORE_NAME)
                 .objectStore(IDB.STORE_NAME)
                 .get(key);
+            return retrieved;
         });
     }
 }
