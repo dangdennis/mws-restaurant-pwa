@@ -6,6 +6,10 @@ class DBHelper {
      * Database URL.
      * Change this to restaurants.json file location on your server.
      */
+    static get IDB() {
+        return new IDB();
+    }
+
     static get DATABASE_URL() {
         const port = 1337; // Change this to your server port
         return `http://localhost:${port}/restaurants`;
@@ -15,13 +19,25 @@ class DBHelper {
      * Fetch all restaurants.
      */
     static async fetchRestaurants(callback) {
+        let restaurants;
+
         try {
-            const restaurants = await fetch(DBHelper.DATABASE_URL).then(res => res.json());
-            console.log({ restaurants });
+            // Get restaurants from indexedDB if it exists
+            if (IDB.isIndexedDBSupported) {
+                await IDB.createObjectStore();
+                restaurants = await IDB.get('restaurants');
+            }
+
+            // Fetch restaurants if still undefined after Idb attempt
+            // if (!restaurants) {
+            //     console.log('we have to fetch restaurants from a server');
+            //     restaurants = await fetch(DBHelper.DATABASE_URL).then(res => res.json());
+            //     IDB.set('restaurants', restaurants);
+            // }
+
             callback(null, restaurants);
         } catch (error) {
             console.log('Request failed: ', error);
-            // const error = `Request failed. Returned status of ${error}`;
             callback(error, null);
         }
     }
@@ -164,5 +180,55 @@ class DBHelper {
             animation: google.maps.Animation.DROP
         });
         return marker;
+    }
+}
+
+class IDB {
+    static get DATABASE_NAME() {
+        return 'mws-restaurant';
+    }
+
+    static get STORE_NAME() {
+        return 'firstOS';
+    }
+
+    static isIndexedDBSupported() {
+        if (!('indexedDB' in window)) {
+            console.log("This browser doesn't support IndexedDB");
+            return false;
+        }
+        return true;
+    }
+
+    static createObjectStore() {
+        const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDb => {
+            console.log({ upgradeDb });
+
+            if (!upgradeDb.objectStoreNames.contains('firstOS')) {
+                console.log('creating first os');
+                upgradeDb.createObjectStore('firstOS');
+            }
+        });
+    }
+
+    static set(key, val) {
+        const dbPromise = idb.open(IDB.DATABASE_NAME, 1);
+        dbPromise
+            .then(db => {
+                const tx = db.transaction(IDB.STORE_NAME, 'readwrite');
+                tx.objectStore(IDB.STORE_NAME).put(val, key);
+                return tx.complete;
+            })
+            .then(() => console.log('Successfully stored data'));
+    }
+
+    static get(key) {
+        const dbPromise = idb.open(IDB.DATABASE_NAME, 1);
+        return dbPromise.then(db => {
+            return db
+                .transaction(IDB.STORE_NAME)
+                .objectStore(IDB.STORE_NAME)
+                .get(key);
+        });
     }
 }
