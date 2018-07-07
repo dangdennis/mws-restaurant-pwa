@@ -2,20 +2,20 @@
     "short_name": "Restaurants",
     "name": "MWS Restaurants",
     "icons": [
-      {
-        "src": "/images/icons-192.png",
-        "type": "image/png",
-        "sizes": "192x192"
-      },
-      {
-        "src": "/images/icons-512.png",
-        "type": "image/png",
-        "sizes": "512x512"
-      }
+        {
+            "src": "/img/dish.svg",
+            "type": "image/svg",
+            "sizes": "192x192"
+        },
+        {
+            "src": "/img/dish.svg",
+            "type": "image/svg",
+            "sizes": "512x512"
+        }
     ],
-    "start_url": "/maps/?source=pwa",
-    "background_color": "#3367D6",
+    "start_url": "/index.html?source=pwa",
+    "background_color": "#3397db",
     "display": "standalone",
-    "scope": "/maps/",
-    "theme_color": "#3367D6"
-  }
+    "scope": "/",
+    "theme_color": "#3397db"
+}
