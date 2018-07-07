@@ -25,7 +25,6 @@ var cacheFiles = [
 const version = '0.6.11';
 const cacheName = `restaurant-mws-${version}`;
 self.addEventListener('install', e => {
-    console.log('Service worker installing');
     const timeStamp = Date.now();
     e.waitUntil(
         caches.open(cacheName).then(cache => {
@@ -35,14 +34,11 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', event => {
-    console.log('Service worker activating');
     // console.log(event.request);
     event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', event => {
-    console.log('Service worker fetching');
-    // console.log(event.request);
     event.respondWith(
         caches
             .open(cacheName)
