@@ -34,7 +34,6 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', event => {
-    // console.log(event.request);
     event.waitUntil(self.clients.claim());
 });
 
