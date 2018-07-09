@@ -24,19 +24,19 @@ class DBHelper {
         try {
             // Get restaurants from indexedDB if it exists
             if (IDB.isIndexedDBSupported) {
-                await IDB.createObjectStore();
-                restaurants = await IDB.get('restaurants').then(res => res);
+                await IDB.createObjectStore("firstOS");
+                restaurants = await IDB.get("restaurants").then(res => res);
             }
 
             // Fetch restaurants if still undefined after Idb attempt
             if (!restaurants) {
                 restaurants = await fetch(DBHelper.DATABASE_URL).then(res => res.json());
-                IDB.set('restaurants', restaurants);
+                IDB.set("restaurants", restaurants);
             }
 
             callback(null, restaurants);
         } catch (error) {
-            console.log('Request failed: ', error);
+            console.log("Request failed: ", error);
             callback(error, null);
         }
     }
@@ -56,7 +56,7 @@ class DBHelper {
                     callback(null, restaurant);
                 } else {
                     // Restaurant does not exist in the database
-                    callback('Restaurant does not exist', null);
+                    callback("Restaurant does not exist", null);
                 }
             }
         });
@@ -104,11 +104,11 @@ class DBHelper {
                 callback(error, null);
             } else {
                 let results = restaurants;
-                if (cuisine != 'all') {
+                if (cuisine != "all") {
                     // filter by cuisine
                     results = results.filter(r => r.cuisine_type == cuisine);
                 }
-                if (neighborhood != 'all') {
+                if (neighborhood != "all") {
                     // filter by neighborhood
                     results = results.filter(r => r.neighborhood == neighborhood);
                 }
@@ -129,7 +129,9 @@ class DBHelper {
                 // Get all neighborhoods from all restaurants
                 const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood);
                 // Remove duplicates from neighborhoods
-                const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i);
+                const uniqueNeighborhoods = neighborhoods.filter(
+                    (v, i) => neighborhoods.indexOf(v) == i,
+                );
                 callback(null, uniqueNeighborhoods);
             }
         });
@@ -151,6 +153,27 @@ class DBHelper {
                 callback(null, uniqueCuisines);
             }
         });
+    }
+
+    /**
+     * Fetch Restaurant reviews by ID
+     */
+    static async fetchRestaurantReviewsById(id, callback) {
+        try {
+            if (IDB.isIndexedDBSupported) {
+                await IDB.createObjectStore();
+                reviews = await IDB.get(`restaurants-${id}`).then(res => res);
+            }
+
+            // Fetch reviews if still undefined after Idb attempt
+            if (!reviews) {
+                reviews = await fetch(DBHelper.DATABASE_URL).then(res => res.json());
+                IDB.set(`restaurants-${id}`, reviews);
+            }
+        } catch (error) {
+            console.log("Request failed: ", error);
+            callback(error, null);
+        }
     }
 
     /**
@@ -176,7 +199,7 @@ class DBHelper {
             title: restaurant.name,
             url: DBHelper.urlForRestaurant(restaurant),
             map: map,
-            animation: google.maps.Animation.DROP
+            animation: google.maps.Animation.DROP,
         });
         return marker;
     }
@@ -184,28 +207,28 @@ class DBHelper {
 
 class IDB {
     static get DATABASE_NAME() {
-        return 'mws-restaurant';
+        return "mws-restaurant";
     }
 
     static get STORE_NAME() {
-        return 'firstOS';
+        return "firstOS";
     }
 
     static isIndexedDBSupported() {
-        if (!('indexedDB' in window)) {
+        if (!("indexedDB" in window)) {
             console.log("This browser doesn't support IndexedDB");
             return false;
         }
         return true;
     }
 
-    static createObjectStore() {
+    static createObjectStore(storeName) {
         const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDb => {
             console.log({ upgradeDb });
 
-            if (!upgradeDb.objectStoreNames.contains('firstOS')) {
-                console.log('creating first os');
-                upgradeDb.createObjectStore('firstOS');
+            if (!upgradeDb.objectStoreNames.contains(storeName)) {
+                console.log("creating object store name: ", storeName);
+                upgradeDb.createObjectStore(storeName);
             }
         });
     }
@@ -214,11 +237,11 @@ class IDB {
         const dbPromise = idb.open(IDB.DATABASE_NAME, 1);
         dbPromise
             .then(db => {
-                const tx = db.transaction(IDB.STORE_NAME, 'readwrite');
+                const tx = db.transaction(IDB.STORE_NAME, "readwrite");
                 tx.objectStore(IDB.STORE_NAME).put(val, key);
                 return tx.complete;
             })
-            .then(() => console.log('Successfully stored data'));
+            .then(() => console.log("Successfully stored data"));
     }
 
     static get(key) {
