@@ -52,11 +52,40 @@
       </div>
     </section>
     <!-- end restaurant -->
-    <!-- Beginning reviews -->
+
     <section id="reviews-container">
+      <!-- Begin review form -->
+      <h4>Add a Review</h4>
+      <form id="ReviewForm" action="POST" method="http://localhost:1337/reviewsd/">
+        <input name="restaurant_id" type="hidden" value="">
+        <label for="ReviewerName" aria-label="Enter Reviewer's Name">Name</label>
+        <input name="name" id="ReviewerName" type="text" placeholder="Full Name" maxlength="30">
+        <label for="ReviewRating" aria-label="Enter Review Rating">Rating</label>
+        <input name="rating" id="ReviewRating" type="number" min="0" max="5" step="1" placeholder="Rating">
+        <label for="ReviewComments" aria-label="Enter comments">Comments</label>
+        <textarea name="comments" id="ReviewComments" cols="30" rows="10"></textarea>
+        <button class="js-submit-review-btn" aria-label="Submit Review" type="button">Submit</button>
+      </form>
+      <!-- End review form -->
+      <!-- Beginning reviews -->
       <ul id="reviews-list" aria-label="List of Reviews"></ul>
+      <!-- End reviews -->
     </section>
-    <!-- End reviews -->
+
+    <!-- POST Endpoints
+    Create a new restaurant review
+
+    http://localhost:1337/reviews/
+
+    Parameters
+
+    {
+    "restaurant_id": <restaurant_id>,
+    "name": <reviewer_name>,
+    "rating": <rating>,
+    "comments": <comment_text>
+    } -->
+    <!-- End review form -->
   </main>
   <!-- End main -->
 
@@ -72,6 +101,7 @@
   <!-- Beginning scripts -->
   <!-- Database helpers -->
   <!-- <script src="js/luxon.js"></script> -->
+  <script src="js/form.js"></script>
   <script src="js/idb.js"></script>
   <script src="js/dbhelper.js"></script>
   <!-- Main javascript file -->

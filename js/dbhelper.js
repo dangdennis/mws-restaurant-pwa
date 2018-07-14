@@ -26,9 +26,12 @@ class DBHelper {
         };
     }
 
-    async apiFetcher(url) {
+    async apiFetcher(url, method = 'GET') {
         try {
-            const result = await fetch(url).then(res => res.json());
+            const options = {
+                method
+            };
+            const result = await fetch(url, options).then(res => res.json());
             console.log({ result });
             return result;
         } catch (error) {

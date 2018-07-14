@@ -1,5 +1,11 @@
 let map;
 let DB = new DBHelper();
+let form = new Form();
+
+window.addEventListener('DOMContentLoaded', () => {
+    form.initElements();
+    form.initHandlers();
+});
 
 /**
  * Initialize Google map, called from HTML.
@@ -171,14 +177,3 @@ getParameterByName = (name, url) => {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
-
-function timeConverter(UNIX_timestamp) {
-    var a = new Date(UNIX_timestamp);
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var time = `${date} ${month} ${year}`;
-    console.log(a.toDateString());
-    return time;
-}
