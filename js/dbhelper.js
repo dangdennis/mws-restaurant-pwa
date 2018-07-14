@@ -10,9 +10,23 @@ class DBHelper {
         return new IDB();
     }
 
+    /**
+     * Returns an object of all endpoints
+     * Quick and dirty way to store all my urls
+     */
     static get DATABASE_URL() {
+        const domain = `http://localhost:`;
         const port = 1337; // Change this to your server port
-        return `http://localhost:${port}/restaurants`;
+        const origin = `${domain}${port}`;
+        return {
+            restaurants: `${origin}/restaurants`, // All restaurants, or 1 with ID
+            restaurantsFavorites: `${origin}/restaurants/?is_favorite=true`, // All favorited restaurants
+            restaurantReviews: `${origin}/reviews/?restaurant_id=`, // All reviews by restaurant ID
+            reviews: `${origin}/reviews/`, // All reviews, or 1 with ID
+            faveRestaurant: id => `${origin}/restaurants/${id}/is_favorite=true`,
+            unFaveRestaurant: id => `${origin}/restaurants/${id}/is_favorite=false`,
+            editReview: id => `${origin}/reviews/${id}`, // PUT = update, DELETE = delete review
+        };
     }
 
     /**
@@ -30,7 +44,9 @@ class DBHelper {
 
             // Fetch restaurants if still undefined after Idb attempt
             if (!restaurants) {
-                restaurants = await fetch(DBHelper.DATABASE_URL).then(res => res.json());
+                restaurants = await fetch(DBHelper.DATABASE_URL.restaurants).then(res =>
+                    res.json(),
+                );
                 IDB.set("restaurants", restaurants);
             }
 
@@ -167,7 +183,7 @@ class DBHelper {
 
             // Fetch reviews if still undefined after Idb attempt
             if (!reviews) {
-                reviews = await fetch(DBHelper.DATABASE_URL).then(res => res.json());
+                reviews = await fetch(DBHelper.DATABASE_URL.restaurants).then(res => res.json());
                 IDB.set(`restaurants-${id}`, reviews);
             }
         } catch (error) {
