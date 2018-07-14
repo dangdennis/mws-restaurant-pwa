@@ -21,8 +21,7 @@ fetchNeighborhoods = () => {
             // Got an error
             console.error(error);
         } else {
-            self.neighborhoods = neighborhoods;
-            fillNeighborhoodsHTML();
+            fillNeighborhoodsHTML(neighborhoods);
         }
     });
 };
@@ -49,8 +48,7 @@ fetchCuisines = () => {
             // Got an error!
             console.error(error);
         } else {
-            self.cuisines = cuisines;
-            fillCuisinesHTML();
+            fillCuisinesHTML(cuisines);
         }
     });
 };

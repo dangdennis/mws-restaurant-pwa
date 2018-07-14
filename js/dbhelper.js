@@ -39,7 +39,6 @@ class DBHelper {
     async fetchFavoriteRestaurants(callback) {
         const url = this.DATABASE_URL().restaurantsFavorites;
         const res = await this.apiFetcher(url);
-        console.log({ res });
         if (callback) {
             callback(res);
         }
@@ -48,7 +47,6 @@ class DBHelper {
     async faveARestaurant(id, callback) {
         const url = this.DATABASE_URL.faveRestaurant(id);
         const res = await this.apiFetcher(url);
-        console.log({ res });
         if (callback) {
             callback(res);
         }
@@ -57,7 +55,6 @@ class DBHelper {
     async unfaveRestaurant(id, callback) {
         const url = this.DATABASE_URL.unfaveRestaurant(id);
         const res = await this.apiFetcher(url);
-        console.log({ res });
         if (callback) {
             callback(res);
         }
@@ -66,7 +63,6 @@ class DBHelper {
     async fetchAllReviews(callback) {
         const url = this.DATABASE_URL.faveRestaurant;
         const res = await this.apiFetcher(url);
-        console.log({ res });
         if (callback) {
             callback(res);
         }
@@ -75,7 +71,6 @@ class DBHelper {
     async fetchAReview(id, callback) {
         const url = this.DATABASE_URL.faveRestaurant + id;
         const res = await this.apiFetcher(url);
-        console.log({ res });
         if (callback) {
             callback(res);
         }
@@ -87,9 +82,8 @@ class DBHelper {
     async fetchRestaurants(callback) {
         const url = this.DATABASE_URL.restaurants;
         const res = await this.apiFetcher(url);
-        console.log({ res });
         if (callback) {
-            callback(res);
+            callback(null, res);
         }
         // let restaurants;
 
@@ -119,7 +113,6 @@ class DBHelper {
     async fetchRestaurantById(id, callback) {
         const url = this.DATABASE_URL.restaurants + id;
         const res = await this.apiFetcher(url);
-        console.log({ res });
         if (callback) {
             callback(null, res);
         }
@@ -251,7 +244,6 @@ class DBHelper {
     async fetchRestaurantReviewsById(id, callback) {
         const url = this.DATABASE_URL.restaurantReviews + id;
         const res = await this.apiFetcher(url);
-        console.log({ res });
         if (callback) {
             callback(null, res);
         }
