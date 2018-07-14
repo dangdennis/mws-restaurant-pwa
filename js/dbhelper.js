@@ -16,19 +16,19 @@ class DBHelper {
         const port = 1337; // Change this to your server port
         const origin = `${domain}${port}`;
         return {
-            restaurants: `${origin}/restaurants`, // All restaurants, or 1 with ID
-            restaurantsFavorites: `${origin}/restaurants/?is_favorite=true`, // All favorited restaurants
-            restaurantReviews: `${origin}/reviews/?restaurant_id=`, // All reviews by restaurant ID
-            reviews: `${origin}/reviews/`, // All reviews, or 1 with ID
-            faveRestaurant: id => `${origin}/restaurants/${id}/is_favorite=true`, // Favorite a restaurant by ID
-            unFaveRestaurant: id => `${origin}/restaurants/${id}/is_favorite=false`, // Unfavorite a restaurant by ID
+            restaurants: `${origin}/restaurants/`, // GET: All restaurants, or 1 with ID
+            restaurantsFavorites: `${origin}/restaurants/?is_favorite=true`, // GET: All favorited restaurants
+            restaurantReviews: `${origin}/reviews/?restaurant_id=`, // GET: All reviews by restaurant ID
+            reviews: `${origin}/reviews/`, // GET: All reviews, or 1 with ID
+            faveRestaurant: id => `${origin}/restaurants/${id}/is_favorite=true`, // PUT: Favorite a restaurant by ID
+            unfaveRestaurant: id => `${origin}/restaurants/${id}/is_favorite=false`, // PUT: Unfavorite a restaurant by ID
             editReview: id => `${origin}/reviews/${id}` // PUT = update, DELETE = delete review
         };
     }
 
     async apiFetcher(url) {
         try {
-            const result = await fetch(url).then(res => res.json);
+            const result = await fetch(url).then(res => res.json());
             console.log({ result });
             return result;
         } catch (error) {
@@ -40,56 +40,108 @@ class DBHelper {
         const url = this.DATABASE_URL().restaurantsFavorites;
         const res = await this.apiFetcher(url);
         console.log({ res });
-        callback(res);
+        if (callback) {
+            callback(res);
+        }
     }
 
-    async faveRestaurantAction() {}
+    async faveARestaurant(id, callback) {
+        const url = this.DATABASE_URL.faveRestaurant(id);
+        const res = await this.apiFetcher(url);
+        console.log({ res });
+        if (callback) {
+            callback(res);
+        }
+    }
+
+    async unfaveRestaurant(id, callback) {
+        const url = this.DATABASE_URL.unfaveRestaurant(id);
+        const res = await this.apiFetcher(url);
+        console.log({ res });
+        if (callback) {
+            callback(res);
+        }
+    }
+
+    async fetchAllReviews(callback) {
+        const url = this.DATABASE_URL.faveRestaurant;
+        const res = await this.apiFetcher(url);
+        console.log({ res });
+        if (callback) {
+            callback(res);
+        }
+    }
+
+    async fetchAReview(id, callback) {
+        const url = this.DATABASE_URL.faveRestaurant + id;
+        const res = await this.apiFetcher(url);
+        console.log({ res });
+        if (callback) {
+            callback(res);
+        }
+    }
 
     /**
      * Fetch all restaurants.
      */
     async fetchRestaurants(callback) {
-        let restaurants;
-
-        try {
-            // Get restaurants from indexedDB if it exists
-            if (this.IDB.isIndexedDBSupported) {
-                await this.IDB.createObjectStore('firstOS');
-                restaurants = await this.IDB.get('restaurants').then(res => res);
-            }
-
-            // Fetch restaurants if still undefined after Idb attempt
-            if (!restaurants) {
-                restaurants = await fetch(this.DATABASE_URL.restaurants).then(res => res.json());
-                this.IDB.set('restaurants', restaurants);
-            }
-
-            callback(null, restaurants);
-        } catch (error) {
-            console.log('Request failed: ', error);
-            callback(error, null);
+        const url = this.DATABASE_URL.restaurants;
+        const res = await this.apiFetcher(url);
+        console.log({ res });
+        if (callback) {
+            callback(res);
         }
+        // let restaurants;
+
+        // try {
+        //     // Get restaurants from indexedDB if it exists
+        //     if (this.IDB.isIndexedDBSupported) {
+        //         await this.IDB.createObjectStore('firstOS');
+        //         restaurants = await this.IDB.get('restaurants').then(res => res);
+        //     }
+
+        //     // Fetch restaurants if still undefined after Idb attempt
+        //     if (!restaurants) {
+        //         restaurants = await fetch(this.DATABASE_URL.restaurants).then(res => res.json());
+        //         this.IDB.set('restaurants', restaurants);
+        //     }
+
+        //     callback(null, restaurants);
+        // } catch (error) {
+        //     console.log('Request failed: ', error);
+        //     callback(error, null);
+        // }
     }
 
     /**
      * Fetch a restaurant by its ID.
      */
-    fetchRestaurantById(id, callback) {
+    async fetchRestaurantById(id, callback) {
+        const url = this.DATABASE_URL.restaurants + id;
+        const res = await this.apiFetcher(url);
+        console.log({ res });
+        if (callback) {
+            callback(null, res);
+        }
         // fetch all restaurants with proper error handling.
-        this.fetchRestaurants((error, restaurants) => {
-            if (error) {
-                callback(error, null);
-            } else {
-                const restaurant = restaurants.find(r => r.id == id);
-                if (restaurant) {
-                    // Got the restaurant
-                    callback(null, restaurant);
-                } else {
-                    // Restaurant does not exist in the database
-                    callback('Restaurant does not exist', null);
-                }
-            }
-        });
+        // this.fetchRestaurants((error, restaurants) => {
+        //     if (error) {
+        //         callback(error, null);
+        //     } else {
+        //         const restaurant = restaurants.find(r => r.id == id);
+        //         if (restaurant) {
+        //             // Got the restaurant
+        //             if (callback) {
+        //                 callback(null, restaurant);
+        //             }
+        //         } else {
+        //             // Restaurant does not exist in the database
+        //             if (callback) {
+        //                 callback('Restaurant does not exist', null);
+        //             }
+        //         }
+        //     }
+        // });
     }
 
     /**
@@ -103,7 +155,9 @@ class DBHelper {
             } else {
                 // Filter restaurants to have only given cuisine type
                 const results = restaurants.filter(r => r.cuisine_type == cuisine);
-                callback(null, results);
+                if (callback) {
+                    callback(null, results);
+                }
             }
         });
     }
@@ -119,7 +173,9 @@ class DBHelper {
             } else {
                 // Filter restaurants to have only given neighborhood
                 const results = restaurants.filter(r => r.neighborhood == neighborhood);
-                callback(null, results);
+                if (callback) {
+                    callback(null, results);
+                }
             }
         });
     }
@@ -142,7 +198,9 @@ class DBHelper {
                     // filter by neighborhood
                     results = results.filter(r => r.neighborhood == neighborhood);
                 }
-                callback(null, results);
+                if (callback) {
+                    callback(null, results);
+                }
             }
         });
     }
@@ -160,7 +218,9 @@ class DBHelper {
                 const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood);
                 // Remove duplicates from neighborhoods
                 const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i);
-                callback(null, uniqueNeighborhoods);
+                if (callback) {
+                    callback(null, uniqueNeighborhoods);
+                }
             }
         });
     }
@@ -178,7 +238,9 @@ class DBHelper {
                 const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type);
                 // Remove duplicates from cuisines
                 const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i);
-                callback(null, uniqueCuisines);
+                if (callback) {
+                    callback(null, uniqueCuisines);
+                }
             }
         });
     }
@@ -187,21 +249,28 @@ class DBHelper {
      * Fetch Restaurant reviews by ID
      */
     async fetchRestaurantReviewsById(id, callback) {
-        try {
-            if (this.IDB.isIndexedDBSupported) {
-                await this.IDB.createObjectStore();
-                reviews = await this.IDB.get(`restaurants-${id}`).then(res => res);
-            }
-
-            // Fetch reviews if still undefined after Idb attempt
-            if (!reviews) {
-                reviews = await fetch(this.DATABASE_URL.restaurants).then(res => res.json());
-                this.IDB.set(`restaurants-${id}`, reviews);
-            }
-        } catch (error) {
-            console.log('Request failed: ', error);
-            callback(error, null);
+        const url = this.DATABASE_URL.restaurantReviews + id;
+        const res = await this.apiFetcher(url);
+        console.log({ res });
+        if (callback) {
+            callback(null, res);
         }
+
+        // try {
+        //     if (this.IDB.isIndexedDBSupported) {
+        //         await this.IDB.createObjectStore();
+        //         reviews = await this.IDB.get(`restaurants-${id}`).then(res => res);
+        //     }
+
+        //     // Fetch reviews if still undefined after Idb attempt
+        //     if (!reviews) {
+        //         reviews = await fetch(this.DATABASE_URL.restaurants).then(res => res.json());
+        //         this.IDB.set(`restaurants-${id}`, reviews);
+        //     }
+        // } catch (error) {
+        //     console.log('Request failed: ', error);
+        //     callback(error, null);
+        // }
     }
 
     /**

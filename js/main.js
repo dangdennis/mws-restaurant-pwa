@@ -181,9 +181,3 @@ addMarkersToMap = (restaurants = self.restaurants) => {
         self.markers.push(marker);
     });
 };
-
-// const addAriaToIFrame = () => {
-//     const mapIFrame = document.querySelector('#map iframe');
-//     console.log('map frame', mapIFrame);
-//     mapIFrame.setAttribute('name', 'Google Map');
-// };
