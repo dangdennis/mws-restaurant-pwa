@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', event => {
     fetchNeighborhoods();
     console.log('initializing page');
     fetchCuisines();
+    DB.fetchFavoriteRestaurants(console.log);
 });
 
 /**
@@ -139,6 +140,8 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = restaurant => {
     const li = document.createElement('li');
     li.setAttribute('aria-label', 'restaurant');
+    li.setAttribute('data-restaurant-id', restaurant.id);
+    li.setAttribute('data-favorite', restaurant.is_favorite);
 
     const image = document.createElement('img');
     image.className = 'restaurant-img';
@@ -162,6 +165,24 @@ createRestaurantHTML = restaurant => {
     more.innerHTML = 'View Details';
     more.href = DB.urlForRestaurant(restaurant);
     li.append(more);
+
+    const heart = document.createElement('i');
+    heart.classList.add('fa-heart', 'fa-2x');
+    if (restaurant.is_favorite === true || restaurant.is_favorite === 'true') {
+        heart.classList.add('fas');
+    } else {
+        heart.classList.add('far');
+    }
+    heart.addEventListener('click', function(e) {
+        const id = this.parentNode.getAttribute('data-restaurant-id');
+        const isFavorite = this.parentNode.getAttribute('data-favorite');
+        console.log({ isFavorite });
+        DB.faveRestaurant(id, isFavorite, console.log);
+        // TODO: AJAX this later
+        // location.reload();
+    });
+
+    li.append(heart);
 
     return li;
 };

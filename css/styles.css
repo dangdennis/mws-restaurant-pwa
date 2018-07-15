@@ -179,8 +179,10 @@ nav h1 a {
     text-align: center;
 }
 #restaurants-list li {
+    display: flex;
     background-color: #fff;
     border: 2px solid #ccc;
+    flex-direction: column;
     font-family: Arial, sans-serif;
     margin: 15px;
     min-height: 380px;
@@ -222,6 +224,11 @@ nav h1 a {
     text-align: center;
     text-decoration: none;
     text-transform: uppercase;
+}
+#restaurants-list .fas,
+#restaurants-list .far {
+    align-self: center;
+    cursor: pointer;
 }
 
 /* ====================== Restaurant Details ====================== */

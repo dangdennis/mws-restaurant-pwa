@@ -28,7 +28,8 @@ Get all reviews for a restaurant
 
 http://localhost:1337/reviews/?restaurant_id=<restaurant_id>
 
-POST Endpoints
+# POST Endpoints
+
 Create a new restaurant review
 
 http://localhost:1337/reviews/
@@ -42,7 +43,8 @@ Parameters
 "comments": <comment_text>
 }
 
-PUT Endpoints
+# PUT Endpoints
+
 Favorite a restaurant
 
 http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true

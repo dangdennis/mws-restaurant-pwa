@@ -20,8 +20,8 @@ class DBHelper {
             restaurantsFavorites: `${origin}/restaurants/?is_favorite=true`, // GET: All favorited restaurants
             restaurantReviews: `${origin}/reviews/?restaurant_id=`, // GET: All reviews by restaurant ID
             reviews: `${origin}/reviews/`, // GET: All reviews, or 1 with ID
-            faveRestaurant: id => `${origin}/restaurants/${id}/is_favorite=true`, // PUT: Favorite a restaurant by ID
-            unfaveRestaurant: id => `${origin}/restaurants/${id}/is_favorite=false`, // PUT: Unfavorite a restaurant by ID
+            faveRestaurant: id => `${origin}/restaurants/${id}/?is_favorite=true`, // PUT: Favorite a restaurant by ID
+            unfaveRestaurant: id => `${origin}/restaurants/${id}/?is_favorite=false`, // PUT: Unfavorite a restaurant by ID
             editReview: id => `${origin}/reviews/${id}` // PUT = update, DELETE = delete review
         };
     }
@@ -40,24 +40,21 @@ class DBHelper {
     }
 
     async fetchFavoriteRestaurants(callback) {
-        const url = this.DATABASE_URL().restaurantsFavorites;
+        const url = this.DATABASE_URL.restaurantsFavorites;
         const res = await this.apiFetcher(url);
         if (callback) {
             callback(res);
         }
     }
 
-    async faveARestaurant(id, callback) {
-        const url = this.DATABASE_URL.faveRestaurant(id);
-        const res = await this.apiFetcher(url);
-        if (callback) {
-            callback(res);
+    async faveRestaurant(id, faveState, callback) {
+        let url;
+        if (!faveState) {
+            url = this.DATABASE_URL.faveRestaurant(id);
+        } else {
+            url = this.DATABASE_URL.unfaveRestaurant(id);
         }
-    }
-
-    async unfaveRestaurant(id, callback) {
-        const url = this.DATABASE_URL.unfaveRestaurant(id);
-        const res = await this.apiFetcher(url);
+        const res = await this.apiFetcher(url, 'PUT');
         if (callback) {
             callback(res);
         }
