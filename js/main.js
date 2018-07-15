@@ -69,9 +69,10 @@ updateRestaurants = restaurants => {
     const cuisine = cSelect[cIndex].value;
     const neighborhood = nSelect[nIndex].value;
 
-    const filtered = DB.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, restaurants);
-    resetRestaurants(filtered);
-    fillRestaurantsHTML(filtered);
+    DB.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, restaurants).then(filtered => {
+        resetRestaurants(filtered);
+        fillRestaurantsHTML(filtered);
+    });
 };
 
 /**
@@ -97,7 +98,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     restaurants.forEach(restaurant => {
         ul.append(createRestaurantHTML(restaurant));
     });
-    addMarkersToMap(restaurants);
+    addMarkersToMap();
 };
 
 /**

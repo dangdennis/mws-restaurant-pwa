@@ -178,9 +178,11 @@ class DBHelper {
     /**
      * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
      */
-    fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, restaurants) {
+    async fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, restaurants) {
         // Fetch all restaurants
-
+        if (!restaurants || !restaurants.length) {
+            restaurants = await this.fetchRestaurants();
+        }
         let results = restaurants;
         if (cuisine != 'all') {
             // filter by cuisine
