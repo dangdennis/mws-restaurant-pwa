@@ -6,26 +6,13 @@ let DB = new DBHelper();
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
-document.addEventListener('DOMContentLoaded', event => {
-    fetchNeighborhoods();
+document.addEventListener('DOMContentLoaded', async event => {
     console.log('initializing page');
-    fetchCuisines();
-    DB.fetchFavoriteRestaurants(console.log);
+    const restaurants = await DB.fetchRestaurants();
+    fillNeighborhoodsHTML(DB.filterNeighborhoods(restaurants));
+    fillCuisinesHTML(DB.filterCuisines(restaurants));
+    updateRestaurants(restaurants);
 });
-
-/**
- * Fetch all neighborhoods and set their HTML.
- */
-fetchNeighborhoods = () => {
-    DB.fetchNeighborhoods((error, neighborhoods) => {
-        if (error) {
-            // Got an error
-            console.error(error);
-        } else {
-            fillNeighborhoodsHTML(neighborhoods);
-        }
-    });
-};
 
 /**
  * Set neighborhoods HTML.
@@ -37,20 +24,6 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
         option.innerHTML = neighborhood;
         option.value = neighborhood;
         select.append(option);
-    });
-};
-
-/**
- * Fetch all cuisines and set their HTML.
- */
-fetchCuisines = () => {
-    DB.fetchCuisines((error, cuisines) => {
-        if (error) {
-            // Got an error!
-            console.error(error);
-        } else {
-            fillCuisinesHTML(cuisines);
-        }
     });
 };
 
@@ -81,13 +54,12 @@ window.initMap = () => {
         center: loc,
         scrollwheel: false
     });
-    updateRestaurants();
 };
 
 /**
  * Update page and map for current restaurants.
  */
-updateRestaurants = () => {
+updateRestaurants = restaurants => {
     const cSelect = document.getElementById('cuisines-select');
     const nSelect = document.getElementById('neighborhoods-select');
 
@@ -97,15 +69,9 @@ updateRestaurants = () => {
     const cuisine = cSelect[cIndex].value;
     const neighborhood = nSelect[nIndex].value;
 
-    DB.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-        if (error) {
-            // Got an error!
-            console.error(error);
-        } else {
-            resetRestaurants(restaurants);
-            fillRestaurantsHTML();
-        }
-    });
+    const filtered = DB.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, restaurants);
+    resetRestaurants(filtered);
+    fillRestaurantsHTML(filtered);
 };
 
 /**
@@ -131,7 +97,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     restaurants.forEach(restaurant => {
         ul.append(createRestaurantHTML(restaurant));
     });
-    addMarkersToMap();
+    addMarkersToMap(restaurants);
 };
 
 /**
