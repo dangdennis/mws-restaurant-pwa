@@ -8,7 +8,8 @@
   <!-- Normalize.css for better cross-browser consistency -->
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <!-- Main CSS file -->
-  <link rel="stylesheet" href="css/styles.css" type="text/css">
+  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="css/styles.css">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1c6ca4">
   <title>Restaurant Info</title>
@@ -55,20 +56,37 @@
 
     <section id="reviews-container">
       <!-- Begin review form -->
-      <h4>Add a Review</h4>
-      <form id="ReviewForm" action="POST" method="http://localhost:1337/reviewsd/">
-        <input name="restaurant_id" type="hidden" value="">
-        <label for="ReviewerName" aria-label="Enter Reviewer's Name">Name</label>
-        <input name="name" id="ReviewerName" type="text" placeholder="Full Name" maxlength="30">
-        <label for="ReviewRating" aria-label="Enter Review Rating">Rating</label>
-        <input name="rating" id="ReviewRating" type="number" min="0" max="5" step="1" placeholder="Rating">
-        <label for="ReviewComments" aria-label="Enter comments">Comments</label>
-        <textarea name="comments" id="ReviewComments" cols="30" rows="10"></textarea>
-        <button class="js-submit-review-btn" aria-label="Submit Review" type="button">Submit</button>
+      <form aria-label="Review Form" class="form-style-7" id="ReviewForm">
+        <h4>Add a Review</h4>
+        <ul>
+          <li style="display:none;">
+            <input id="RestaurantId" name="restaurant_id" type="hidden">
+          </li>
+          <li>
+            <label for="ReviewerName" aria-label="Enter Reviewer's Name">Name</label>
+            <input name="name" id="ReviewerName" type="text" placeholder="Full Name" maxlength="100">
+            <span>Enter your full name here</span>
+          </li>
+          <li>
+            <label for="ReviewRating" aria-label="Enter Review Rating">Rating</label>
+            <input name="rating" id="ReviewRating" type="number" min="0" max="5" step="1" placeholder="Rating 1-5">
+            <span>Enter a rating</span>
+          </li>
+          <li>
+            <label for="ReviewComments" aria-label="Enter comments">Comments</label>
+            <textarea name="comments" id="ReviewComments" cols="30" rows="10" style="height: 99px;" placeholder="Enter your comments"></textarea>
+            <span>Say something about the restaurant</span>
+          </li>
+          <li>
+            <button class="js-submit-review-btn btn" aria-label="Submit Review" type="button">Submit</button>
+          </li>
+        </ul>
       </form>
       <!-- End review form -->
       <!-- Beginning reviews -->
-      <ul id="reviews-list" aria-label="List of Reviews"></ul>
+      <ul id="reviews-list" aria-label="List of Reviews">
+        <h3 class="reviews-header">Reviews</h3>
+      </ul>
       <!-- End reviews -->
     </section>
 

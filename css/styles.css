@@ -112,7 +112,7 @@ nav h1 a {
 #breadcrumb li + li:before {
     padding: 8px;
     color: black;
-    content: "/\00a0";
+    content: '/\00a0';
 }
 
 /* Add a color to all links inside the list */
@@ -289,6 +289,9 @@ nav h1 a {
 #reviews-container {
     padding: 30px 40px 80px;
 }
+#reviews-container .reviews-header {
+    text-align: center;
+}
 #reviews-container h2 {
     color: #f58500;
     font-size: 24pt;
@@ -337,6 +340,9 @@ nav h1 a {
     text-transform: uppercase;
     text-align: center;
     width: 100px;
+}
+#reviews-list .btn-danger {
+    float: right;
 }
 #restaurant-hours td {
     color: #666;
@@ -406,4 +412,30 @@ nav h1 a {
     .inside #footer {
         width: 100%;
     }
+}
+
+.btn {
+    position: relative;
+    padding: 12px 30px;
+    margin: 0.3125rem 1px;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.428571;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    border: 0;
+    border-radius: 0.2rem;
+    outline: 0;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: box-shadow, transform;
+    cursor: pointer;
+}
+
+.btn.btn-danger {
+    color: #fff;
+    background-color: #f44336;
+    border-color: #f44336;
+    box-shadow: 0 2px 2px 0 rgba(244, 67, 54, 0.14), 0 3px 1px -2px rgba(244, 67, 54, 0.2),
+        0 1px 5px 0 rgba(244, 67, 54, 0.12);
 }

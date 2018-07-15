@@ -3,8 +3,7 @@ let DB = new DBHelper();
 let form = new Form();
 
 window.addEventListener('DOMContentLoaded', () => {
-    form.initElements();
-    form.initHandlers();
+    form.init();
 });
 
 /**
@@ -38,11 +37,6 @@ fetchRestaurantFromURL = callback => {
         callback(error, null);
     } else {
         DB.fetchRestaurantById(id, (error, restaurant) => {
-            console.log({ restaurant });
-            // if (!restaurant) {
-            //     console.error(error);
-            //     return;
-            // }
             fillRestaurantHTML(restaurant);
             callback(null, restaurant);
         });
@@ -102,9 +96,6 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillReviewsHTML = reviews => {
     const container = document.getElementById('reviews-container');
-    const title = document.createElement('h3');
-    title.innerHTML = 'Reviews';
-    container.appendChild(title);
 
     if (!reviews) {
         const noReviews = document.createElement('p');
@@ -127,6 +118,7 @@ createReviewHTML = review => {
     header.classList.add('header');
     const li = document.createElement('li');
     li.setAttribute('aria-label', 'Review');
+    li.setAttribute('data-review-id', review.id);
 
     const name = document.createElement('p');
     name.innerHTML = review.name;
@@ -152,6 +144,17 @@ createReviewHTML = review => {
     li.appendChild(rating);
     li.appendChild(comments);
 
+    const deleteBtn = document.createElement('button');
+    deleteBtn.classList.add('btn', 'btn-danger');
+    deleteBtn.setAttribute('aria-label', 'Delete this review');
+    deleteBtn.textContent = 'Delete';
+    // TODO: should have event delegation later
+    deleteBtn.addEventListener('click', function(e) {
+        deleteReview(this.parentNode.getAttribute('data-review-id'));
+    });
+
+    li.appendChild(deleteBtn);
+
     return li;
 };
 
@@ -176,4 +179,18 @@ getParameterByName = (name, url) => {
     if (!results) return null;
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
+};
+
+deleteReview = id => {
+    const url = 'http://localhost:1337/reviews/' + id;
+    fetch(url, {
+        method: 'DELETE'
+    })
+        .then(res => {
+            console.log({ res });
+            console.log('Delete successful');
+            // TODO: AJAX render new reviews
+            location.reload();
+        })
+        .catch(error => console.error('error', error));
 };
