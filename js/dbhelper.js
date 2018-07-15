@@ -9,7 +9,6 @@ class DBHelper {
     /**
      * Database URL.
      * Returns an object of all endpoints
-     * Quick and dirty way to store all my urls
      */
     get DATABASE_URL() {
         const domain = `http://localhost:`;
@@ -79,33 +78,30 @@ class DBHelper {
     /**
      * Fetch all restaurants.
      */
-    async fetchRestaurants(callback) {
-        const url = this.DATABASE_URL.restaurants;
-        const res = await this.apiFetcher(url);
-        if (callback) {
-            callback(null, res);
+    async fetchRestaurants() {
+        let restaurants;
+
+        try {
+            // Get restaurants from indexedDB if it exists
+            if (this.IDB.isIndexedDBSupported) {
+                await this.IDB.createObjectStore('restaurants');
+                restaurants = await this.IDB.get('restaurants').then(res => res);
+                if (restaurants) {
+                    return restaurants;
+                }
+            }
+
+            // Fetch restaurants if still undefined after Idb attempt
+            if (!restaurants) {
+                const url = this.DATABASE_URL.restaurants;
+                restaurants = await this.apiFetcher(url);
+                this.IDB.set('restaurants', restaurants);
+                return restaurants;
+            }
+        } catch (error) {
+            console.log('Request failed: ', error);
+            return [];
         }
-        return res;
-        // let restaurants;
-
-        // try {
-        //     // Get restaurants from indexedDB if it exists
-        //     if (this.IDB.isIndexedDBSupported) {
-        //         await this.IDB.createObjectStore('firstOS');
-        //         restaurants = await this.IDB.get('restaurants').then(res => res);
-        //     }
-
-        //     // Fetch restaurants if still undefined after Idb attempt
-        //     if (!restaurants) {
-        //         restaurants = await fetch(this.DATABASE_URL.restaurants).then(res => res.json());
-        //         this.IDB.set('restaurants', restaurants);
-        //     }
-
-        //     callback(null, restaurants);
-        // } catch (error) {
-        //     console.log('Request failed: ', error);
-        //     callback(error, null);
-        // }
     }
 
     /**
