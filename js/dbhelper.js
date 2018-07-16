@@ -21,20 +21,20 @@ class DBHelper {
             reviews: `${origin}/reviews/`, // GET: All reviews, or 1 with ID
             faveRestaurant: id => `${origin}/restaurants/${id}/?is_favorite=true`, // PUT: Favorite a restaurant by ID
             unfaveRestaurant: id => `${origin}/restaurants/${id}/?is_favorite=false`, // PUT: Unfavorite a restaurant by ID
-            editReview: id => `${origin}/reviews/${id}` // PUT = update, DELETE = delete review
+            editReview: id => `${origin}/reviews/${id}`, // PUT = update, DELETE = delete review
         };
     }
 
-    async apiFetcher(url, method = 'GET') {
+    async apiFetcher(url, method = "GET") {
         try {
             const options = {
-                method
+                method,
             };
             const result = await fetch(url, options).then(res => res.json());
             console.log({ result });
             return result;
         } catch (error) {
-            console.warn('You got a network error:', error);
+            console.warn("You got a network error:", error);
         }
     }
 
@@ -53,7 +53,7 @@ class DBHelper {
         } else {
             url = this.DATABASE_URL.unfaveRestaurant(id);
         }
-        const res = await this.apiFetcher(url, 'PUT');
+        const res = await this.apiFetcher(url, "PUT");
         if (callback) {
             callback(res);
         }
@@ -83,23 +83,24 @@ class DBHelper {
 
         try {
             // Get restaurants from indexedDB if it exists
-            if (this.IDB.isIndexedDBSupported) {
-                await this.IDB.createObjectStore('restaurants');
-                restaurants = await this.IDB.get('restaurants').then(res => res);
-                if (restaurants) {
-                    return restaurants;
-                }
+            const dbPromise = await this.IDB.createObjectStore("restaurants");
+            console.log({ dbPromise });
+            // restaurants = await this.IDB.get('restaurants').then(res => res);
+            if (restaurants) {
+                console.log("got restaurants from idb", restaurants);
+                return restaurants;
             }
 
             // Fetch restaurants if still undefined after Idb attempt
             if (!restaurants) {
                 const url = this.DATABASE_URL.restaurants;
                 restaurants = await this.apiFetcher(url);
-                this.IDB.set('restaurants', restaurants);
+                this.IDB.set("restaurants", restaurants, "restaurants");
+                console.log("fetching restaurants from network");
                 return restaurants;
             }
         } catch (error) {
-            console.log('Request failed: ', error);
+            console.log("Request failed: ", error);
             return [];
         }
     }
@@ -180,11 +181,11 @@ class DBHelper {
             restaurants = await this.fetchRestaurants();
         }
         let results = restaurants;
-        if (cuisine != 'all') {
+        if (cuisine != "all") {
             // filter by cuisine
             results = results.filter(r => r.cuisine_type == cuisine);
         }
-        if (neighborhood != 'all') {
+        if (neighborhood != "all") {
             // filter by neighborhood
             results = results.filter(r => r.neighborhood == neighborhood);
         }
@@ -262,7 +263,7 @@ class DBHelper {
             title: restaurant.name,
             url: this.urlForRestaurant(restaurant),
             map: map,
-            animation: google.maps.Animation.DROP
+            animation: google.maps.Animation.DROP,
         });
         return marker;
     }
@@ -270,15 +271,15 @@ class DBHelper {
 
 class IDB {
     static get DATABASE_NAME() {
-        return 'mws-restaurant';
+        return "mws-restaurant";
     }
 
     static get STORE_NAME() {
-        return 'firstOS';
+        return "firstOS";
     }
 
     isIndexedDBSupported() {
-        if (!('indexedDB' in window)) {
+        if (!("indexedDB" in window)) {
             console.log("This browser doesn't support IndexedDB");
             return false;
         }
@@ -286,25 +287,28 @@ class IDB {
     }
 
     createObjectStore(storeName) {
-        const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDb => {
-            console.log({ upgradeDb });
+        if (this.isIndexedDBSupported) {
+            const idbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDb => {
+                console.log({ upgradeDb });
 
-            if (!upgradeDb.objectStoreNames.contains(storeName)) {
-                console.log('creating object store name: ', storeName);
-                upgradeDb.createObjectStore(storeName);
-            }
-        });
+                if (!upgradeDb.objectStoreNames.contains(storeName)) {
+                    console.log("creating object store name: ", storeName);
+                    upgradeDb.createObjectStore(storeName);
+                }
+            });
+            return idbPromise;
+        }
     }
 
-    set(key, val) {
+    set(key, val, storeName) {
         const dbPromise = idb.open(IDB.DATABASE_NAME, 1);
         dbPromise
             .then(db => {
-                const tx = db.transaction(IDB.STORE_NAME, 'readwrite');
-                tx.objectStore(IDB.STORE_NAME).put(val, key);
+                const tx = db.transaction(storeName, "readwrite");
+                tx.objectStore(storeName).put(val, key);
                 return tx.complete;
             })
-            .then(() => console.log('Successfully stored data'));
+            .then(() => console.log("Successfully stored data"));
     }
 
     get(key) {
