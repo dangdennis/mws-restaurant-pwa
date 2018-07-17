@@ -1,6 +1,7 @@
 class Form {
     constructor() {
         this.el = {};
+        this.DB = new DBHelper();
     }
     initElements() {
         this.el.submitButton = document.querySelector('.js-submit-review-btn');
@@ -9,6 +10,7 @@ class Form {
         this.el.nameInput = document.querySelector('#ReviewerName');
         this.el.commentInput = document.querySelector('#ReviewComments');
         this.el.ratingInput = document.querySelector('#ReviewRating');
+        this.el.reviewList = document.querySelector('#reviews-list');
     }
     initHandlers() {
         this.el.submitButton.addEventListener('click', this.handleReviewSubmission.bind(this));
@@ -42,11 +44,15 @@ class Form {
                         timeout: 6000
                     });
                     // TODO: AJAX render new reviews
+                    const id = getParameterByName('id');
+                    DB.fetchRestaurantReviewsById(id, (error, reviews) => {
+                        this.el.reviewList.innerHTML = '';
+                        const reviewList = fillReviewsHTML(reviews);
+                    });
                     this.resetForm();
                 })
                 .catch(error => {
                     console.error('error', error);
-
                     this.resetForm();
                     let toast = VanillaToasts.create({
                         title: 'Out of network!',

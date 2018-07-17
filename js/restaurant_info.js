@@ -41,7 +41,6 @@ fetchRestaurantFromURL = callback => {
             callback(null, restaurant);
         });
         DB.fetchRestaurantReviewsById(id, (error, reviews) => {
-            // fill reviews
             fillReviewsHTML(reviews);
         });
     }
