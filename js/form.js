@@ -37,15 +37,7 @@ class Form {
                     console.log('Post successful');
 
                     // TODO: AJAX render new reviews
-                    // this.resetForm();
-                    // let DB = new DBHelper();
-                    // const restaurantId = this.el.restaurantInput.value;
-                    // DB.fetchRestaurantReviewsById(restaurantId, (error, reviews) => {
-                    //     // fill reviews
-                    //     fillReviewsHTML(reviews);
-                    // });
-
-                    location.reload();
+                    this.resetForm();
                 })
                 .catch(error => console.error('error', error));
         }
@@ -53,15 +45,22 @@ class Form {
 
     validateForm() {
         if (this.el.nameInput.value.length === 0) {
-            return false;
-        }
-        if (this.el.commentInput.length === 0) {
+            this.el.nameInput.setAttribute('aria-invalid', true);
+            this.el.nameInput.style.border = '1px solid red';
             return false;
         }
         const rating = parseInt(this.el.ratingInput.value);
         if (isNaN(rating) || rating < 0 || rating > 5) {
+            this.el.ratingInput.setAttribute('aria-invalid', true);
+            this.el.ratingInput.style.border = '1px solid red';
             return false;
         }
+        if (this.el.commentInput.value.length === 0) {
+            this.el.commentInput.setAttribute('aria-invalid', true);
+            this.el.commentInput.style.border = '1px solid red';
+            return false;
+        }
+
         return true;
     }
 
@@ -71,10 +70,15 @@ class Form {
     }
 
     resetForm() {
-        this.el.restaurantInput.value = '';
         this.el.nameInput.value = '';
+        this.el.nameInput.setAttribute('aria-invalid', false);
+        this.el.nameInput.style.border = '';
         this.el.commentInput.value = '';
+        this.el.commentInput.setAttribute('aria-invalid', false);
+        this.el.commentInput.style.border = '';
         this.el.ratingInput.value = '';
+        this.el.ratingInput.setAttribute('aria-invalid', false);
+        this.el.ratingInput.style.border = '';
     }
 
     triggerFormState(state) {

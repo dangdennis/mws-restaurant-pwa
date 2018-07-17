@@ -10,6 +10,7 @@
   <!-- Main CSS file -->
   <link rel="stylesheet" href="css/form.css">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/vanillatoasts.css">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1c6ca4">
   <title>Restaurant Info</title>
@@ -57,8 +58,8 @@
     <section id="reviews-container">
       <!-- Begin review form -->
       <form aria-label="Review Form" class="form-style-7" id="ReviewForm">
-        <h4>Add a Review</h4>
-        <ul>
+        <h4 id="FormReview">Add a Review</h4>
+        <ul aria-labelledby="FormReview">
           <li style="display:none;">
             <input id="RestaurantId" name="restaurant_id" type="hidden">
           </li>
@@ -89,21 +90,6 @@
       </ul>
       <!-- End reviews -->
     </section>
-
-    <!-- POST Endpoints
-    Create a new restaurant review
-
-    http://localhost:1337/reviews/
-
-    Parameters
-
-    {
-    "restaurant_id": <restaurant_id>,
-    "name": <reviewer_name>,
-    "rating": <rating>,
-    "comments": <comment_text>
-    } -->
-    <!-- End review form -->
   </main>
   <!-- End main -->
 
@@ -119,6 +105,7 @@
   <!-- Beginning scripts -->
   <!-- Database helpers -->
   <!-- <script src="js/luxon.js"></script> -->
+  <script src="js/vanillatoasts.js"></script>
   <script src="js/form.js"></script>
   <script src="js/idb.js"></script>
   <script src="js/dbhelper.js"></script>

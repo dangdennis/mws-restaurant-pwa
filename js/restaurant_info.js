@@ -22,6 +22,13 @@ window.initMap = () => {
             });
             fillBreadcrumb(restaurant);
             DB.mapMarkerForRestaurant(restaurant, self.map);
+            let toast = VanillaToasts.create({
+                title: 'Welcome to my site',
+                text: 'This toast will hide after 5000ms or when you click it',
+                type: 'error', // success, info, warning, error   / optional parameter
+                timeout: 30000 // hide after 5000ms, // optional parameter
+                // callback: function() { ... } // executed when toast is clicked / optional parameter
+            });
         }
     });
 };
@@ -186,11 +193,18 @@ deleteReview = id => {
     fetch(url, {
         method: 'DELETE'
     })
-        .then(res => {
-            console.log({ res });
+        .then(_ => {
+            const NodeToDelete = document.querySelector(`[data-review-id='${id}']`);
+            NodeToDelete.outerHTML = '';
             console.log('Delete successful');
-            // TODO: AJAX render new reviews
-            location.reload();
         })
-        .catch(error => console.error('error', error));
+        .catch(error => {
+            console.error('error', error);
+            let toast = VanillaToasts.create({
+                title: 'Out of network!',
+                text: 'Deletion registered. Once you have network, the update will occur.',
+                type: 'error',
+                timeout: 6000
+            });
+        });
 };
