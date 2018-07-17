@@ -16,16 +16,21 @@ class Form {
         this.el.submitButton.addEventListener('click', this.handleReviewSubmission.bind(this));
     }
 
+    getReview() {
+        const body = {
+            restaurant_id: this.el.restaurantInput.value,
+            name: this.el.nameInput.value,
+            rating: parseInt(this.el.ratingInput.value),
+            comments: this.el.commentInput.value
+        };
+        return body;
+    }
+
     handleReviewSubmission(e) {
         // e.preventDefault();
         if (this.validateForm.call(this)) {
             console.log('submitting');
-            const body = {
-                restaurant_id: this.el.restaurantInput.value,
-                name: this.el.nameInput.value,
-                rating: parseInt(this.el.ratingInput.value),
-                comments: this.el.commentInput.value
-            };
+            const review = this.getReview();
             fetch('http://localhost:1337/reviews/', {
                 body: JSON.stringify(body),
                 mode: 'cors',
@@ -37,29 +42,29 @@ class Form {
                 .then(res => {
                     console.log({ res });
                     console.log('Post successful');
+
                     let toast = VanillaToasts.create({
                         title: 'Review submitted!',
                         text: 'Thanks for sharing your thoughts.',
                         type: 'success',
                         timeout: 6000
                     });
-                    // TODO: AJAX render new reviews
-                    const id = getParameterByName('id');
-                    DB.fetchRestaurantReviewsById(id, (error, reviews) => {
-                        this.el.reviewList.innerHTML = '';
-                        const reviewList = fillReviewsHTML(reviews);
-                    });
+                    this.fetchMoreReviews();
                     this.resetForm();
                 })
                 .catch(error => {
-                    console.error('error', error);
-                    this.resetForm();
-                    let toast = VanillaToasts.create({
-                        title: 'Out of network!',
-                        text: 'Review submission registered. Once you have network, your review will be sent.',
-                        type: 'error',
-                        timeout: 6000
-                    });
+                    // Cuz I don't know how else to check for network errors
+                    if (error.message === 'Failed to fetch') {
+                        let toast = VanillaToasts.create({
+                            title: 'Out of network!',
+                            text: 'Thanks for the review! Once you have connection, your review will be sent.',
+                            type: 'error',
+                            timeout: 6000
+                        });
+                        const review = this.getReview();
+                        this.saveReviewToIDB(review);
+                        this.resetForm();
+                    }
                 });
         }
     }
@@ -102,9 +107,16 @@ class Form {
         this.el.ratingInput.style.border = '';
     }
 
-    triggerFormState(state) {
-        if (state === 'error') {
-        }
+    saveReviewToIDB(review) {
+        console.log('saving review');
+    }
+
+    fetchMoreReviews() {
+        const id = getParameterByName('id');
+        DB.fetchRestaurantReviewsById(id, (error, reviews) => {
+            this.el.reviewList.innerHTML = '';
+            fillReviewsHTML(reviews);
+        });
     }
 
     init() {
