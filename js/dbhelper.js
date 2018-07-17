@@ -21,23 +21,32 @@ class DBHelper {
             reviews: `${origin}/reviews/`, // GET: All reviews, or 1 with ID
             faveRestaurant: id => `${origin}/restaurants/${id}/?is_favorite=true`, // PUT: Favorite a restaurant by ID
             unfaveRestaurant: id => `${origin}/restaurants/${id}/?is_favorite=false`, // PUT: Unfavorite a restaurant by ID
-            editReview: id => `${origin}/reviews/${id}`, // PUT = update, DELETE = delete review
+            editReview: id => `${origin}/reviews/${id}` // PUT = update, DELETE = delete review
         };
     }
 
-    async apiFetcher(url, method = "GET") {
+    /**
+     * General fetch utility
+     * @param {String} url
+     * @param {String} method
+     */
+    async apiFetcher(url, method = 'GET') {
         try {
             const options = {
-                method,
+                method
             };
             const result = await fetch(url, options).then(res => res.json());
             console.log({ result });
             return result;
         } catch (error) {
-            console.warn("You got a network error:", error);
+            console.warn('You got a network error:', error);
         }
     }
 
+    /**
+     * Fetches all favorite restaurants only
+     * @param {function} callback
+     */
     async fetchFavoriteRestaurants(callback) {
         const url = this.DATABASE_URL.restaurantsFavorites;
         const res = await this.apiFetcher(url);
@@ -46,6 +55,12 @@ class DBHelper {
         }
     }
 
+    /**
+     * A user can favorite a restaurant
+     * @param {String} id
+     * @param {Boolean} faveState
+     * @param {Function} callback
+     */
     async faveRestaurant(id, faveState, callback) {
         let url;
         if (!faveState) {
@@ -53,12 +68,16 @@ class DBHelper {
         } else {
             url = this.DATABASE_URL.unfaveRestaurant(id);
         }
-        const res = await this.apiFetcher(url, "PUT");
+        const res = await this.apiFetcher(url, 'PUT');
         if (callback) {
             callback(res);
         }
     }
 
+    /**
+     * Unused
+     * @param {Function} callback
+     */
     async fetchAllReviews(callback) {
         const url = this.DATABASE_URL.faveRestaurant;
         const res = await this.apiFetcher(url);
@@ -67,6 +86,11 @@ class DBHelper {
         }
     }
 
+    /**
+     * Unused
+     * @param {String} id
+     * @param {Function} callback
+     */
     async fetchAReview(id, callback) {
         const url = this.DATABASE_URL.faveRestaurant + id;
         const res = await this.apiFetcher(url);
@@ -76,18 +100,17 @@ class DBHelper {
     }
 
     /**
-     * Fetch all restaurants.
+     * Fetches all restaurants
      */
     async fetchRestaurants() {
         let restaurants;
 
         try {
+            const _ = await this.IDB.createObjectStore('restaurants');
             // Get restaurants from indexedDB if it exists
-            const dbPromise = await this.IDB.createObjectStore("restaurants");
-            console.log({ dbPromise });
-            // restaurants = await this.IDB.get('restaurants').then(res => res);
+            restaurants = await this.IDB.get('restaurants', 'restaurants').then(res => res);
             if (restaurants) {
-                console.log("got restaurants from idb", restaurants);
+                console.log('got restaurants from idb', restaurants);
                 return restaurants;
             }
 
@@ -95,12 +118,12 @@ class DBHelper {
             if (!restaurants) {
                 const url = this.DATABASE_URL.restaurants;
                 restaurants = await this.apiFetcher(url);
-                this.IDB.set("restaurants", restaurants, "restaurants");
-                console.log("fetching restaurants from network");
+                this.IDB.set('restaurants', restaurants, 'restaurants');
+                console.log('fetching restaurants from network');
                 return restaurants;
             }
         } catch (error) {
-            console.log("Request failed: ", error);
+            console.log('Request failed: ', error);
             return [];
         }
     }
@@ -109,31 +132,34 @@ class DBHelper {
      * Fetch a restaurant by its ID.
      */
     async fetchRestaurantById(id, callback) {
-        const url = this.DATABASE_URL.restaurants + id;
-        const res = await this.apiFetcher(url);
-        if (callback) {
-            callback(null, res);
+        let restaurant;
+        const storeName = `restaurant-${id}`;
+        try {
+            const idbPromise = await this.IDB.createObjectStore(storeName);
+
+            // restaurant = await this.IDB.get(storeName, storeName).then(res => res);
+            if (restaurant) {
+                console.log('fetch restaurant from idb');
+                if (callback) {
+                    callback(null, restaurant);
+                }
+                return restaurant;
+            }
+
+            if (!restaurant) {
+                const url = this.DATABASE_URL.restaurants + id;
+                restaurant = await this.apiFetcher(url);
+                this.IDB.set(storeName, restaurant, storeName);
+                console.log('fetch restaurant from network');
+                if (callback) {
+                    callback(null, restaurant);
+                }
+                return restaurant;
+            }
+        } catch (error) {
+            console.log('Request failed: ', error);
+            return {};
         }
-        return res;
-        // fetch all restaurants with proper error handling.
-        // this.fetchRestaurants((error, restaurants) => {
-        //     if (error) {
-        //         callback(error, null);
-        //     } else {
-        //         const restaurant = restaurants.find(r => r.id == id);
-        //         if (restaurant) {
-        //             // Got the restaurant
-        //             if (callback) {
-        //                 callback(null, restaurant);
-        //             }
-        //         } else {
-        //             // Restaurant does not exist in the database
-        //             if (callback) {
-        //                 callback('Restaurant does not exist', null);
-        //             }
-        //         }
-        //     }
-        // });
     }
 
     /**
@@ -181,11 +207,11 @@ class DBHelper {
             restaurants = await this.fetchRestaurants();
         }
         let results = restaurants;
-        if (cuisine != "all") {
+        if (cuisine != 'all') {
             // filter by cuisine
             results = results.filter(r => r.cuisine_type == cuisine);
         }
-        if (neighborhood != "all") {
+        if (neighborhood != 'all') {
             // filter by neighborhood
             results = results.filter(r => r.neighborhood == neighborhood);
         }
@@ -222,22 +248,6 @@ class DBHelper {
         if (callback) {
             callback(null, res);
         }
-
-        // try {
-        //     if (this.IDB.isIndexedDBSupported) {
-        //         await this.IDB.createObjectStore();
-        //         reviews = await this.IDB.get(`restaurants-${id}`).then(res => res);
-        //     }
-
-        //     // Fetch reviews if still undefined after Idb attempt
-        //     if (!reviews) {
-        //         reviews = await fetch(this.DATABASE_URL.restaurants).then(res => res.json());
-        //         this.IDB.set(`restaurants-${id}`, reviews);
-        //     }
-        // } catch (error) {
-        //     console.log('Request failed: ', error);
-        //     callback(error, null);
-        // }
     }
 
     /**
@@ -263,7 +273,7 @@ class DBHelper {
             title: restaurant.name,
             url: this.urlForRestaurant(restaurant),
             map: map,
-            animation: google.maps.Animation.DROP,
+            animation: google.maps.Animation.DROP
         });
         return marker;
     }
@@ -271,15 +281,15 @@ class DBHelper {
 
 class IDB {
     static get DATABASE_NAME() {
-        return "mws-restaurant";
+        return 'mws-restaurant';
     }
 
     static get STORE_NAME() {
-        return "firstOS";
+        return 'firstOS';
     }
 
     isIndexedDBSupported() {
-        if (!("indexedDB" in window)) {
+        if (!('indexedDB' in window)) {
             console.log("This browser doesn't support IndexedDB");
             return false;
         }
@@ -292,7 +302,7 @@ class IDB {
                 console.log({ upgradeDb });
 
                 if (!upgradeDb.objectStoreNames.contains(storeName)) {
-                    console.log("creating object store name: ", storeName);
+                    console.log('creating object store name: ', storeName);
                     upgradeDb.createObjectStore(storeName);
                 }
             });
@@ -301,22 +311,26 @@ class IDB {
     }
 
     set(key, val, storeName) {
-        const dbPromise = idb.open(IDB.DATABASE_NAME, 1);
+        const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDB => {
+            upgradeDB.createObjectStore(storeName);
+        });
         dbPromise
             .then(db => {
-                const tx = db.transaction(storeName, "readwrite");
+                const tx = db.transaction(storeName, 'readwrite');
                 tx.objectStore(storeName).put(val, key);
                 return tx.complete;
             })
-            .then(() => console.log("Successfully stored data"));
+            .then(() => console.log('Successfully stored data'));
     }
 
-    get(key) {
-        const dbPromise = idb.open(IDB.DATABASE_NAME, 1);
+    get(key, storeName) {
+        const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDB => {
+            upgradeDB.createObjectStore(storeName);
+        });
         return dbPromise.then(db => {
             const retrieved = db
-                .transaction(IDB.STORE_NAME)
-                .objectStore(IDB.STORE_NAME)
+                .transaction(storeName)
+                .objectStore(storeName)
                 .get(key);
             return retrieved;
         });
