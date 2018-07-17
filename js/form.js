@@ -35,11 +35,26 @@ class Form {
                 .then(res => {
                     console.log({ res });
                     console.log('Post successful');
-
+                    let toast = VanillaToasts.create({
+                        title: 'Review submitted!',
+                        text: 'Thanks for sharing your thoughts.',
+                        type: 'success',
+                        timeout: 6000
+                    });
                     // TODO: AJAX render new reviews
                     this.resetForm();
                 })
-                .catch(error => console.error('error', error));
+                .catch(error => {
+                    console.error('error', error);
+
+                    this.resetForm();
+                    let toast = VanillaToasts.create({
+                        title: 'Out of network!',
+                        text: 'Review submission registered. Once you have network, your review will be sent.',
+                        type: 'error',
+                        timeout: 6000
+                    });
+                });
         }
     }
 

@@ -22,13 +22,6 @@ window.initMap = () => {
             });
             fillBreadcrumb(restaurant);
             DB.mapMarkerForRestaurant(restaurant, self.map);
-            let toast = VanillaToasts.create({
-                title: 'Welcome to my site',
-                text: 'This toast will hide after 5000ms or when you click it',
-                type: 'error', // success, info, warning, error   / optional parameter
-                timeout: 30000 // hide after 5000ms, // optional parameter
-                // callback: function() { ... } // executed when toast is clicked / optional parameter
-            });
         }
     });
 };
