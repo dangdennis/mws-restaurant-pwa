@@ -308,6 +308,7 @@ class IDB {
                 if (!upgradeDb.objectStoreNames.contains('reviews')) {
                     console.log('creating object store name: ', 'reviews');
                     const reviewsOS = upgradeDb.createObjectStore('reviews', { autoIncrement: true });
+                    reviewsOS.createIndex('id', 'name', { unique: false });
                 }
             });
             return idbPromise;
@@ -377,5 +378,31 @@ class IDB {
             .then(function(items) {
                 return items;
             });
+    }
+
+    cursor(callback, storeName) {
+        const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDB => {
+            if (!upgradeDb.objectStoreNames.contains(storeName)) {
+                upgradeDB.createObjectStore(storeName);
+            }
+        });
+        return dbPromise
+            .then(function(db) {
+                var tx = db.transaction(storeName, 'readonly');
+                var store = tx.objectStore(storeName);
+                return store.openCursor();
+            })
+            .then(async function mapCursors(cursor) {
+                if (!cursor) {
+                    return;
+                }
+                if (callback) {
+                    await callback(cursor.value, cursor.key);
+                }
+                return cursor.continue().then(mapCursors);
+            });
+        // .then(function() {
+        //     console.log('Done checking for offline reviews');
+        // });
     }
 }

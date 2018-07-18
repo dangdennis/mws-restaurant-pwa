@@ -17,7 +17,7 @@ class Form {
         this.el.submitButton.addEventListener('click', this.handleReviewSubmission.bind(this));
     }
 
-    getReview() {
+    getReviewFromForm() {
         const body = {
             restaurant_id: this.el.restaurantInput.value,
             name: this.el.nameInput.value,
@@ -38,7 +38,7 @@ class Form {
     handleReviewSubmission(e) {
         if (this.validateForm.call(this)) {
             console.log('submitting');
-            const review = this.getReview();
+            const review = this.getReviewFromForm();
             this.postReview(review)
                 .then(this.onFormSubmissionSuccess.bind(this))
                 .catch(this.onFormSubmissionError.bind(this));
@@ -81,7 +81,7 @@ class Form {
                 type: 'error',
                 timeout: 6000
             });
-            const review = this.getReview();
+            const review = this.getReviewFromForm();
             this.saveReviewToIDB(review);
             this.resetForm();
         }
@@ -138,21 +138,22 @@ class Form {
         return reviews;
     }
 
-    async submitReviewsFromIDB() {
+    submitReviewsFromIDB() {
         const objStoreName = 'reviews';
-        const reviewsFromIDB = await this.getReviewsFromIDB();
-        if (reviewsFromIDB.length > 0) {
-            for await (let [id, review] of reviewsFromIDB.entries()) {
-                // Refactor: Currently using index from array to delete reviews in object store
-                console.log({ id, review });
-                this.postReview(review).then(res => {
-                    console.log({ res });
-                    if (res.status === 201) {
-                        this.IDB.delete(id, objStoreName);
-                        this.fetchReviewsFromNetwork();
-                    }
-                });
-            }
+        this.IDB.cursor(postReviewWithinIDB, objStoreName);
+
+        let postReview = this.postReview.bind(this);
+        let idbDelete = this.IDB.delete.bind(this);
+        let fetchReviewsFromNetwork = this.fetchReviewsFromNetwork.bind(this);
+
+        function postReviewWithinIDB(review, key) {
+            postReview(review).then(res => {
+                console.log({ res });
+                if (res.status === 201) {
+                    idbDelete(key, objStoreName);
+                    fetchReviewsFromNetwork();
+                }
+            });
         }
     }
 
