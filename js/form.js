@@ -1,6 +1,7 @@
 class Form {
     constructor() {
         this.el = {};
+        this.isInitialLoad = true;
         this.DB = new DBHelper();
     }
     initElements() {
