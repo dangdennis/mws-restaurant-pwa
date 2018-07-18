@@ -37,7 +37,6 @@ class Form {
 
     handleReviewSubmission(e) {
         if (this.validateForm.call(this)) {
-            console.log('submitting');
             const review = this.getReviewFromForm();
             this.postReview(review)
                 .then(this.onFormSubmissionSuccess.bind(this))
@@ -57,9 +56,7 @@ class Form {
     }
 
     onFormSubmissionSuccess(res) {
-        console.log({ res });
         if (res.status === 201) {
-            console.log('Post successful');
 
             let toast = VanillaToasts.create({
                 title: 'Review submitted!',
@@ -126,7 +123,6 @@ class Form {
     }
 
     saveReviewToIDB(review) {
-        console.log('saving review', { review });
         const objStoreName = 'reviews';
         this.IDB.set(undefined, review, objStoreName);
     }
@@ -134,7 +130,6 @@ class Form {
     async getReviewsFromIDB() {
         const objStoreName = 'reviews';
         const reviews = await this.IDB.getAll(objStoreName);
-        console.log('all review form submissions', { reviews });
         return reviews;
     }
 
@@ -148,7 +143,6 @@ class Form {
 
         function postReviewWithinIDB(review, key) {
             postReview(review).then(res => {
-                console.log({ res });
                 if (res.status === 201) {
                     idbDelete(key, objStoreName);
                     fetchReviewsFromNetwork();
