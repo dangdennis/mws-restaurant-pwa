@@ -2,7 +2,8 @@ class Form {
     constructor() {
         this.el = {};
         this.isInitialLoad = true;
-        this.DB = new DBHelper();
+        this.IDB = new IDB();
+        this.getReviewsFromIDB();
     }
     initElements() {
         this.el.submitButton = document.querySelector('.js-submit-review-btn');
@@ -33,7 +34,7 @@ class Form {
             console.log('submitting');
             const review = this.getReview();
             fetch('http://localhost:1337/reviews/', {
-                body: JSON.stringify(body),
+                body: JSON.stringify(review),
                 mode: 'cors',
                 method: 'POST',
                 headers: {
@@ -50,7 +51,7 @@ class Form {
                         type: 'success',
                         timeout: 6000
                     });
-                    this.fetchMoreReviews();
+                    this.fetchReviewsFromNetwork();
                     this.resetForm();
                 })
                 .catch(error => {
@@ -109,10 +110,21 @@ class Form {
     }
 
     saveReviewToIDB(review) {
-        console.log('saving review');
+        console.log('saving review', { review });
+        const objStoreName = 'reviews';
+        this.IDB.set(undefined, review, objStoreName);
     }
 
-    fetchMoreReviews() {
+    async getReviewsFromIDB() {
+        const objStoreName = 'reviews';
+        const reviews = await this.IDB.getAll(objStoreName);
+        console.log('all review form submissions', { reviews });
+        return reviews;
+    }
+
+    submitReviewsPrevious() {}
+
+    fetchReviewsFromNetwork() {
         const id = getParameterByName('id');
         DB.fetchRestaurantReviewsById(id, (error, reviews) => {
             this.el.reviewList.innerHTML = '';

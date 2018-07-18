@@ -284,10 +284,6 @@ class IDB {
         return 'mws-restaurant';
     }
 
-    static get STORE_NAME() {
-        return 'firstOS';
-    }
-
     isIndexedDBSupported() {
         if (!('indexedDB' in window)) {
             console.log("This browser doesn't support IndexedDB");
@@ -311,7 +307,7 @@ class IDB {
                 }
                 if (!upgradeDb.objectStoreNames.contains('reviews')) {
                     console.log('creating object store name: ', 'reviews');
-                    upgradeDb.createObjectStore('reviews');
+                    const reviewsOS = upgradeDb.createObjectStore('reviews', { autoIncrement: true });
                 }
             });
             return idbPromise;
@@ -320,7 +316,9 @@ class IDB {
 
     set(key, val, storeName) {
         const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDB => {
-            upgradeDB.createObjectStore(storeName);
+            if (!upgradeDb.objectStoreNames.contains(storeName)) {
+                upgradeDB.createObjectStore(storeName);
+            }
         });
         dbPromise
             .then(db => {
@@ -333,7 +331,9 @@ class IDB {
 
     get(key, storeName) {
         const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDB => {
-            upgradeDB.createObjectStore(storeName);
+            if (!upgradeDb.objectStoreNames.contains(storeName)) {
+                upgradeDB.createObjectStore(storeName);
+            }
         });
         return dbPromise.then(db => {
             const retrieved = db
@@ -342,5 +342,22 @@ class IDB {
                 .get(key);
             return retrieved;
         });
+    }
+
+    getAll(storeName) {
+        const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDB => {
+            if (!upgradeDb.objectStoreNames.contains(storeName)) {
+                upgradeDB.createObjectStore(storeName);
+            }
+        });
+        return dbPromise
+            .then(db => {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                return store.getAll();
+            })
+            .then(function(items) {
+                return items;
+            });
     }
 }
