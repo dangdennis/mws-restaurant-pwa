@@ -386,7 +386,7 @@ class IDB {
                 upgradeDB.createObjectStore(storeName);
             }
         });
-        return dbPromise
+        dbPromise
             .then(function(db) {
                 var tx = db.transaction(storeName, 'readonly');
                 var store = tx.objectStore(storeName);
@@ -400,9 +400,9 @@ class IDB {
                     await callback(cursor.value, cursor.key);
                 }
                 return cursor.continue().then(mapCursors);
+            })
+            .then(function() {
+                console.log('Done checking for offline reviews');
             });
-        // .then(function() {
-        //     console.log('Done checking for offline reviews');
-        // });
     }
 }
