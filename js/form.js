@@ -3,7 +3,6 @@ class Form {
         this.el = {};
         this.isInitialLoad = true;
         this.IDB = new IDB();
-        this.getReviewsFromIDB();
     }
     initElements() {
         this.el.submitButton = document.querySelector('.js-submit-review-btn');
@@ -33,41 +32,59 @@ class Form {
         if (this.validateForm.call(this)) {
             console.log('submitting');
             const review = this.getReview();
-            fetch('http://localhost:1337/reviews/', {
-                body: JSON.stringify(review),
-                mode: 'cors',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8'
-                }
-            })
-                .then(res => {
-                    console.log({ res });
-                    console.log('Post successful');
+            // fetch('http://localhost:1337/reviews/', {
+            //     body: JSON.stringify(review),
+            //     mode: 'cors',
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json; charset=utf-8'
+            //     }
+            // })
+            this.postReview(review)
+                .then(this.onFormSubmissionSuccess)
+                .catch(this.onFormSubmissionError);
+        }
+    }
 
-                    let toast = VanillaToasts.create({
-                        title: 'Review submitted!',
-                        text: 'Thanks for sharing your thoughts.',
-                        type: 'success',
-                        timeout: 6000
-                    });
-                    this.fetchReviewsFromNetwork();
-                    this.resetForm();
-                })
-                .catch(error => {
-                    // Cuz I don't know how else to check for network errors
-                    if (error.message === 'Failed to fetch') {
-                        let toast = VanillaToasts.create({
-                            title: 'Out of network!',
-                            text: 'Thanks for the review! Once you have connection, your review will be sent.',
-                            type: 'error',
-                            timeout: 6000
-                        });
-                        const review = this.getReview();
-                        this.saveReviewToIDB(review);
-                        this.resetForm();
-                    }
-                });
+    postReview(reviewData) {
+        return fetch('http://localhost:1337/reviews/', {
+            body: JSON.stringify(reviewData),
+            mode: 'cors',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        });
+    }
+
+    onFormSubmissionSuccess(res) {
+        console.log({ res });
+        if (res.status === 201) {
+            console.log('Post successful');
+
+            let toast = VanillaToasts.create({
+                title: 'Review submitted!',
+                text: 'Thanks for sharing your thoughts.',
+                type: 'success',
+                timeout: 6000
+            });
+            this.fetchReviewsFromNetwork();
+            this.resetForm();
+        }
+    }
+
+    onFormSubmissionError(error) {
+        // Cuz I don't know how else to check for network errors
+        if (error.message === 'Failed to fetch') {
+            let toast = VanillaToasts.create({
+                title: 'Out of network!',
+                text: 'Thanks for the review! Once you have connection, your review will be sent.',
+                type: 'error',
+                timeout: 6000
+            });
+            const review = this.getReview();
+            this.saveReviewToIDB(review);
+            this.resetForm();
         }
     }
 
@@ -122,7 +139,20 @@ class Form {
         return reviews;
     }
 
-    submitReviewsPrevious() {}
+    async submitReviewsFromIDB() {
+        const reviewsFromIDB = await this.getReviewsFromIDB();
+        if (reviewsFromIDB.length > 0) {
+            for (let [id, review] of reviewsFromIDB.entries()) {
+                // Refactor: Currently using index from array to delete reviews in object store
+                console.log({ id, review });
+                this.postReview(review).then(res => {
+                    console.log({ res });
+                    if (res.status === 201) {
+                    }
+                });
+            }
+        }
+    }
 
     fetchReviewsFromNetwork() {
         const id = getParameterByName('id');
@@ -136,5 +166,9 @@ class Form {
         this.initElements();
         this.initHandlers();
         this.setRestaurantIdToForm();
+        if (this.isInitialLoad) {
+            this.isInitialLoad = false;
+            this.submitReviewsFromIDB();
+        }
     }
 }
