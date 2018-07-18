@@ -194,7 +194,7 @@ deleteReview = id => {
             console.error('error', error);
             let toast = VanillaToasts.create({
                 title: 'Out of network!',
-                text: 'Deletion registered. Once you have network, the update will occur.',
+                text: 'Still in development: deletion will be saved and updated in network',
                 type: 'error',
                 timeout: 6000
             });

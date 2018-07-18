@@ -27,22 +27,21 @@ class Form {
         return body;
     }
 
+    fetchReviewsFromNetwork() {
+        const id = getParameterByName('id');
+        DB.fetchRestaurantReviewsById(id, (error, reviews) => {
+            this.el.reviewList.innerHTML = '';
+            fillReviewsHTML(reviews);
+        });
+    }
+
     handleReviewSubmission(e) {
-        // e.preventDefault();
         if (this.validateForm.call(this)) {
             console.log('submitting');
             const review = this.getReview();
-            // fetch('http://localhost:1337/reviews/', {
-            //     body: JSON.stringify(review),
-            //     mode: 'cors',
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json; charset=utf-8'
-            //     }
-            // })
             this.postReview(review)
-                .then(this.onFormSubmissionSuccess)
-                .catch(this.onFormSubmissionError);
+                .then(this.onFormSubmissionSuccess.bind(this))
+                .catch(this.onFormSubmissionError.bind(this));
         }
     }
 
@@ -140,26 +139,21 @@ class Form {
     }
 
     async submitReviewsFromIDB() {
+        const objStoreName = 'reviews';
         const reviewsFromIDB = await this.getReviewsFromIDB();
         if (reviewsFromIDB.length > 0) {
-            for (let [id, review] of reviewsFromIDB.entries()) {
+            for await (let [id, review] of reviewsFromIDB.entries()) {
                 // Refactor: Currently using index from array to delete reviews in object store
                 console.log({ id, review });
                 this.postReview(review).then(res => {
                     console.log({ res });
                     if (res.status === 201) {
+                        this.IDB.delete(id, objStoreName);
+                        this.fetchReviewsFromNetwork();
                     }
                 });
             }
         }
-    }
-
-    fetchReviewsFromNetwork() {
-        const id = getParameterByName('id');
-        DB.fetchRestaurantReviewsById(id, (error, reviews) => {
-            this.el.reviewList.innerHTML = '';
-            fillReviewsHTML(reviews);
-        });
     }
 
     init() {

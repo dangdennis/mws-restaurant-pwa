@@ -344,6 +344,24 @@ class IDB {
         });
     }
 
+    delete(key, storeName) {
+        const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDB => {
+            if (!upgradeDb.objectStoreNames.contains(storeName)) {
+                upgradeDB.createObjectStore(storeName);
+            }
+        });
+        dbPromise
+            .then(function(db) {
+                var tx = db.transaction(storeName, 'readwrite');
+                var store = tx.objectStore(storeName);
+                store.delete(key);
+                return tx.complete;
+            })
+            .then(function() {
+                console.log('Item deleted');
+            });
+    }
+
     getAll(storeName) {
         const dbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDB => {
             if (!upgradeDb.objectStoreNames.contains(storeName)) {
