@@ -158,9 +158,15 @@ function handleFavoriteClick() {
     DB.faveRestaurant(id, isFavorite, callback);
     DB.alternateInitialLoadState();
 
-    async function callback() {
-        const restaurants = await DB.fetchRestaurants();
-        fillRestaurantsHTML(restaurants);
+    function callback(res) {
+        const favoriteState = res.is_favorite === 'true' ? true : false;
+        let toast = VanillaToasts.create({
+            title: favoriteState ? 'Favorited!' : 'Unfavorited!',
+            text: favoriteState ? `You've favorited ${res.name}` : `You've unfavorited ${res.name}`,
+            type: 'info',
+            timeout: 1500
+        });
+        const restaurants = DB.fetchRestaurants().then(fillRestaurantsHTML);
     }
 }
 

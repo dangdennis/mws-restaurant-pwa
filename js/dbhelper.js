@@ -39,6 +39,7 @@ class DBHelper {
             return result;
         } catch (error) {
             console.warn('You got a network error:', error);
+            return error;
         }
     }
 
@@ -68,7 +69,15 @@ class DBHelper {
             url = this.DATABASE_URL.unfaveRestaurant(id);
         }
         const res = await this.apiFetcher(url, 'PUT');
-        if (callback) {
+        if (res.message === 'Failed to fetch') {
+            let toast = VanillaToasts.create({
+                title: 'Out of network!',
+                text: 'Try favoriting later',
+                type: 'error',
+                timeout: 6000
+            });
+        } else {
+            console.log('resssss', res);
             callback(res);
         }
     }
