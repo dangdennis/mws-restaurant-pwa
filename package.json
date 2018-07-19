@@ -16,5 +16,20 @@
   "bugs": {
     "url": "https://github.com/dangdennis/mws-restaurant-app/issues"
   },
-  "homepage": "https://github.com/dangdennis/mws-restaurant-app#readme"
+  "homepage": "https://github.com/dangdennis/mws-restaurant-app#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-babel": "^7.0.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-csso": "^3.0.1",
+    "gulp-htmlmin": "^4.0.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "run-sequence": "^2.2.1"
+  },
+  "dependencies": {
+    "gulp-uglify": "^3.0.0"
+  }
 }
