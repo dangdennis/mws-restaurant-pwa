@@ -95,6 +95,7 @@ resetRestaurants = restaurants => {
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
     const ul = document.getElementById('restaurants-list');
+    ul.innerHTML = '';
     restaurants.forEach(restaurant => {
         ul.append(createRestaurantHTML(restaurant));
     });
@@ -108,7 +109,8 @@ createRestaurantHTML = restaurant => {
     const li = document.createElement('li');
     li.setAttribute('aria-label', 'restaurant');
     li.setAttribute('data-restaurant-id', restaurant.id);
-    li.setAttribute('data-favorite', restaurant.is_favorite);
+    let isFavorite = restaurant.is_favorite === 'true' ? true : false;
+    li.setAttribute('data-favorite', isFavorite);
 
     const image = document.createElement('img');
     image.className = 'restaurant-img';
@@ -135,24 +137,32 @@ createRestaurantHTML = restaurant => {
 
     const heart = document.createElement('i');
     heart.classList.add('fa-heart', 'fa-2x');
-    if (restaurant.is_favorite === true || restaurant.is_favorite === 'true') {
+
+    // Stupid database is storing true values as String 'false' in db
+    if (isFavorite === true) {
         heart.classList.add('fas');
     } else {
         heart.classList.add('far');
     }
-    heart.addEventListener('click', function(e) {
-        const id = this.parentNode.getAttribute('data-restaurant-id');
-        const isFavorite = this.parentNode.getAttribute('data-favorite');
-        console.log({ isFavorite });
-        DB.faveRestaurant(id, isFavorite, console.log);
-        // TODO: AJAX this later
-        // location.reload();
-    });
+    heart.addEventListener('click', handleFavoriteClick);
 
     li.append(heart);
 
     return li;
 };
+
+function handleFavoriteClick() {
+    const id = this.parentNode.getAttribute('data-restaurant-id');
+    let isFavorite = this.parentNode.getAttribute('data-favorite');
+    isFavorite = isFavorite === 'true' ? true : false;
+    DB.faveRestaurant(id, isFavorite, callback);
+    DB.alternateInitialLoadState();
+
+    async function callback() {
+        const restaurants = await DB.fetchRestaurants();
+        fillRestaurantsHTML(restaurants);
+    }
+}
 
 /**
  * Add markers for current restaurants to the map.

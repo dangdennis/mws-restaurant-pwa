@@ -36,7 +36,6 @@ class DBHelper {
                 method
             };
             const result = await fetch(url, options).then(res => res.json());
-            console.log({ result });
             return result;
         } catch (error) {
             console.warn('You got a network error:', error);
@@ -81,12 +80,16 @@ class DBHelper {
         let restaurants;
 
         try {
-            const _ = await this.IDB.createObjectStore('restaurants');
-            // Get restaurants from indexedDB if it exists
-            restaurants = await this.IDB.get('restaurants', 'restaurants').then(res => res);
-            if (restaurants) {
-                console.log('got restaurants from idb', restaurants);
-                return restaurants;
+            // To invalidate old cache, if first time page load, pull restaurants via network
+            const isInitialLoad = this.checkInitialLoadState();
+            if (!isInitialLoad) {
+                this.IDB.createObjectStore('restaurants');
+                // Get restaurants from indexedDB if it exists
+                restaurants = await this.IDB.get('restaurants', 'restaurants').then(res => res);
+                if (restaurants) {
+                    console.log('got restaurants from idb', restaurants);
+                    return restaurants;
+                }
             }
 
             // Fetch restaurants if still undefined after Idb attempt
@@ -277,6 +280,24 @@ class DBHelper {
             callback(res);
         }
     }
+
+    checkInitialLoadState() {
+        if ('sessionStorage' in window) {
+            if (sessionStorage.getItem('initialLoad') === 'false') {
+                return false;
+            }
+            sessionStorage.setItem('initialLoad', 'false');
+            return true;
+        }
+    }
+
+    alternateInitialLoadState() {
+        if ('sessionStorage' in window) {
+            const currentLoadState = sessionStorage.getItem('initialLoad');
+            const nextState = currentLoadState === 'false' ? true : false;
+            sessionStorage.setItem('initialLoad', nextState);
+        }
+    }
 }
 
 class IDB {
@@ -295,8 +316,6 @@ class IDB {
     createObjectStore(storeName) {
         if (this.isIndexedDBSupported) {
             const idbPromise = idb.open(IDB.DATABASE_NAME, 1, upgradeDb => {
-                console.log({ upgradeDb });
-
                 if (!upgradeDb.objectStoreNames.contains('restaurants')) {
                     console.log('creating object store name: ', 'restaurants');
                     upgradeDb.createObjectStore('restaurants');
