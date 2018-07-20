@@ -128,9 +128,17 @@ nav h1 a {
 }
 /* ====================== Map ====================== */
 #map {
-    height: 400px;
-    width: 100%;
     background-color: #ccc;
+    display: flex;
+    height: 400px;
+    position: relative;
+    width: 100%;
+}
+
+#map .js-toggle-map.btn {
+    position: absolute;
+    left: 5px;
+    top: 5px;
 }
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
@@ -445,4 +453,11 @@ nav h1 a {
     border-color: #f44336;
     box-shadow: 0 2px 2px 0 rgba(244, 67, 54, 0.14), 0 3px 1px -2px rgba(244, 67, 54, 0.2),
         0 1px 5px 0 rgba(244, 67, 54, 0.12);
+}
+
+.btn.btn-primary {
+    color: #fff;
+    box-shadow: 0 2px 2px 0 rgba(156, 39, 176, 0.14), 0 3px 1px -2px rgba(156, 39, 176, 0.2),
+        0 1px 5px 0 rgba(156, 39, 176, 0.12);
+    background-color: #9c27b0;
 }

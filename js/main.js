@@ -1,6 +1,8 @@
 let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
+let canMakeMarkers = false;
+let mapInit = false;
 let DB = new DBHelper();
 
 /**
@@ -12,6 +14,10 @@ document.addEventListener('DOMContentLoaded', async event => {
     fillNeighborhoodsHTML(DB.filterNeighborhoods(restaurants));
     fillCuisinesHTML(DB.filterCuisines(restaurants));
     updateRestaurants(restaurants);
+    // window.initMap();
+
+    const mapToggleBtn = document.querySelector('.js-toggle-map');
+    mapToggleBtn.addEventListener('click', handleMapToggle);
 });
 
 /**
@@ -44,7 +50,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
 /**
  * Initialize Google map, called from HTML.
  */
-window.initMap = () => {
+initMap = () => {
     let loc = {
         lat: 40.722216,
         lng: -73.987501
@@ -54,6 +60,30 @@ window.initMap = () => {
         center: loc,
         scrollwheel: false
     });
+
+    //     const staticMap = `https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=600x300&maptype=roadmap
+    // &markers=color:red%7Clabel:A%7C40.713829,-73.989667&markers=color:red%7Clabel:B%7C40.683555,-73.966393
+    // &markers=color:red%7Clabel:C%7C40.718217,-73.998284&markers
+    // &key=AIzaSyDhvZey30xy9IuidbwzBXESevaR74hPGl8`;
+
+    //     const test = `https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=1000x1000&maptype=roadmap
+    // &markers=color:red%7Clabel:A%7C40.713829,-73.989667&markers=color:red%7Clabel:B%7C40.683555,-73.966393
+    // &markers=color:red%7Clabel:C%7C40.747143,-73.985414&markers=color:red%7Clabel:D%7C40.722216,-73.987501&markers=color:red%7Clabel:E%7C40.705089,-73.933585&markers=color:red%7Clabel:F%7C40.674925,-74.016162&markers=color:red%7Clabel:G%7C40.727397,-73.983645&markers=color:red%7Clabel:H%7C40.726584,-74.002082&markers=color:red%7Clabel:I%7C40.743797,-73.950652&markers=color:red%7Clabel:J%7C40.743394,-73.954235&
+    // &key=AIzaSyDhvZey30xy9IuidbwzBXESevaR74hPGl8`;
+};
+
+handleMapToggle = async e => {
+    // Gate condition to enable map markers on filling html
+    canMakeMarkers = true;
+
+    const button = e.target;
+    button.setAttribute('aria-pressed', 'true');
+    if (!mapInit) {
+        const restaurants = await DB.fetchRestaurants();
+        initMap();
+        addMarkersToMap(restaurants);
+        mapInit = true;
+    }
 };
 
 /**
@@ -99,7 +129,9 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     restaurants.forEach(restaurant => {
         ul.append(createRestaurantHTML(restaurant));
     });
-    addMarkersToMap();
+    if (canMakeMarkers === true) {
+        addMarkersToMap();
+    }
 };
 
 /**

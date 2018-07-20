@@ -24,7 +24,14 @@
 
   <main id="maincontent">
     <section id="map-container">
-      <div id="map" aria-label="locations" role="application"></div>
+      <div id="map" aria-label="locations" role="application">
+        <img src="https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=12&size=640x300&maptype=roadmap
+        &markers=color:red%7Clabel:A%7C40.713829,-73.989667&markers=color:red%7Clabel:B%7C40.683555,-73.966393
+        &markers=color:red%7Clabel:C%7C40.747143,-73.985414&markers=color:red%7Clabel:D%7C40.722216,-73.987501&markers=color:red%7Clabel:E%7C40.705089,-73.933585&markers=color:red%7Clabel:F%7C40.674925,-74.016162&markers=color:red%7Clabel:G%7C40.727397,-73.983645&markers=color:red%7Clabel:H%7C40.726584,-74.002082&markers=color:red%7Clabel:I%7C40.743797,-73.950652&markers=color:red%7Clabel:J%7C40.743394,-73.954235&
+        &key=AIzaSyDhvZey30xy9IuidbwzBXESevaR74hPGl8" aria-label="Map of New York Restaurants" alt="Map of New York Restaurants"
+          style="height: 100%; margin: 0 auto;">
+          <button class="btn js-toggle-map btn-primary" aria-label="Activate Dynamic Map" aria-pressed="false">Activate Dynamic Map</button>
+      </div>
     </section>
     <section>
       <div class="filter-options">
@@ -56,7 +63,7 @@
   <script type="application/javascript" charset="utf-8" src="js/idb.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC66UwvJgp0NdsT0SJ_wSSGAdgk7Q3p-Cc&libraries=places&callback=initMap"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC66UwvJgp0NdsT0SJ_wSSGAdgk7Q3p-Cc&libraries=places"></script>
   <script>
     // Check that service workers are registered
     if ('serviceWorker' in navigator) {
