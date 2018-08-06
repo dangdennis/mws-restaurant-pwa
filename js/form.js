@@ -4,6 +4,8 @@ class Form {
         this.isInitialLoad = true;
         this.IDB = new IDB();
     }
+
+    // Get all elements relevant to the scripts. I do this to organize my variables
     initElements() {
         this.el.submitButton = document.querySelector('.js-submit-review-btn');
         this.el.form = document.querySelector('#ReviewForm');
@@ -13,10 +15,13 @@ class Form {
         this.el.ratingInput = document.querySelector('#ReviewRating');
         this.el.reviewList = document.querySelector('#reviews-list');
     }
+
+    // Organize all my event handlers into here
     initHandlers() {
         this.el.submitButton.addEventListener('click', this.handleReviewSubmission.bind(this));
     }
 
+    // This is simply to get the values from the form input fields
     getReviewFromForm() {
         const body = {
             restaurant_id: this.el.restaurantInput.value,
@@ -27,6 +32,7 @@ class Form {
         return body;
     }
 
+    // Split MWS's fetch logic and the IDB logic
     fetchReviewsFromNetwork() {
         const id = getParameterByName('id');
         DB.fetchRestaurantReviewsById(id, (error, reviews) => {
@@ -35,6 +41,7 @@ class Form {
         });
     }
 
+    // Couple binding because of my use of classes
     handleReviewSubmission(e) {
         if (this.validateForm.call(this)) {
             const review = this.getReviewFromForm();
@@ -44,6 +51,7 @@ class Form {
         }
     }
 
+    // Do duh postz
     postReview(reviewData) {
         return fetch('http://localhost:1337/reviews/', {
             body: JSON.stringify(reviewData),
@@ -55,6 +63,8 @@ class Form {
         });
     }
 
+    // Fun feature
+    // Give user feedback
     onFormSubmissionSuccess(res) {
         if (res.status === 201) {
 
@@ -69,6 +79,7 @@ class Form {
         }
     }
 
+    // Error handling is always a must, although the use of toasts is a fun feature.
     onFormSubmissionError(error) {
         // Cuz I don't know how else to check for network errors
         if (error.message === 'Failed to fetch') {
@@ -84,6 +95,7 @@ class Form {
         }
     }
 
+    // I chose to validate forms with javascript to also enhance accessibility
     validateForm() {
         if (this.el.nameInput.value.length === 0) {
             this.el.nameInput.setAttribute('aria-invalid', true);
@@ -105,11 +117,14 @@ class Form {
         return true;
     }
 
+    // Specifies the restaurant to which the form submission belongs to
+    // Used a hidden input that gets updated with the ID
     setRestaurantIdToForm() {
         var restaurantId = location.search[location.search.indexOf('id=') + 3];
         this.el.restaurantInput.value = restaurantId;
     }
 
+    // Gotta clear the form
     resetForm() {
         this.el.nameInput.value = '';
         this.el.nameInput.setAttribute('aria-invalid', false);
@@ -122,17 +137,26 @@ class Form {
         this.el.ratingInput.style.border = '';
     }
 
+    /*
+    * These 3 functions below handles the connection between IDB and the form 
+    * Meant to save all form submissions
+    */
+
+    // Enables an API to save form submissions
     saveReviewToIDB(review) {
         const objStoreName = 'reviews';
         this.IDB.set(undefined, review, objStoreName);
     }
 
+    // Simply gets all reviews
     async getReviewsFromIDB() {
         const objStoreName = 'reviews';
         const reviews = await this.IDB.getAll(objStoreName);
         return reviews;
     }
 
+    // Trickiest part here is correctly coding out an API to delete reviews 
+    // as they are successfully submitted 
     submitReviewsFromIDB() {
         const objStoreName = 'reviews';
         this.IDB.cursor(postReviewWithinIDB, objStoreName);
