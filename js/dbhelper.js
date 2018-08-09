@@ -78,7 +78,6 @@ class DBHelper {
                 timeout: 6000
             });
         } else {
-            console.log('resssss', res);
             callback(res);
         }
     }
@@ -97,7 +96,6 @@ class DBHelper {
                 // Get restaurants from indexedDB if it exists
                 restaurants = await this.IDB.get('restaurants', 'restaurants').then(res => res);
                 if (restaurants) {
-                    console.log('got restaurants from idb', restaurants);
                     return restaurants;
                 }
             }
@@ -107,7 +105,6 @@ class DBHelper {
                 const url = this.DATABASE_URL.restaurants;
                 restaurants = await this.apiFetcher(url);
                 this.IDB.set('restaurants', restaurants, 'restaurants');
-                console.log('fetching restaurants from network');
                 return restaurants;
             }
         } catch (error) {
@@ -138,7 +135,6 @@ class DBHelper {
                 const url = this.DATABASE_URL.restaurants + id;
                 restaurant = await this.apiFetcher(url);
                 this.IDB.set(id, restaurant, objStoreName);
-                console.log('fetch restaurant from network');
                 if (callback) {
                     callback(null, restaurant);
                 }
