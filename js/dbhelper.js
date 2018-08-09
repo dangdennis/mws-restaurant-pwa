@@ -11,9 +11,10 @@ class DBHelper {
      * Returns an object of all endpoints
      */
     get DATABASE_URL() {
-        const domain = `http://localhost:`;
+        const domain = `https://mws-pwa.appspot.com`;
         const port = 1337; // Change this to your server port
-        const origin = `${domain}${port}`;
+        // const origin = `${domain}${port}`;
+        const origin = `${domain}`
         return {
             restaurants: `${origin}/restaurants/`, // GET: All restaurants, or 1 with ID
             restaurantsFavorites: `${origin}/restaurants/?is_favorite=true`, // GET: All favorited restaurants
