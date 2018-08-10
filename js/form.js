@@ -53,7 +53,7 @@ class Form {
 
     // Do duh postz
     postReview(reviewData) {
-        return fetch(this.IDB.DATABASE_URL.reviews, {
+        return fetch('https://mws-pwa.appspot.com/reviews', {
             body: JSON.stringify(reviewData),
             mode: "cors",
             method: "POST",

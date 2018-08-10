@@ -12,6 +12,7 @@ class DBHelper {
      */
     get DATABASE_URL() {
         const domain = `https://mws-pwa.appspot.com`;
+        // const domain = 'http://localhost:'
         const port = 1337; // Change this to your server port
         // const origin = `${domain}${port}`;
         const origin = `${domain}`
